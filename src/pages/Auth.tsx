@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
 
+
 const Main = styled.div`
     display: flex;
     justify-content: center;
@@ -12,14 +13,18 @@ const Main = styled.div`
     flex-direction: column;
     height: 100vh;
     width: 100vw;
-    background-color: ${COLORS.background};
+    background-image: url('/src/assets/images/waves-bg.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 `;
 
 const Header = styled.div`
-    color: ${COLORS.text};
-    padding: 0 0 50px 0;
-    font-size: 20px;
+    color: ${COLORS.darkText};
+    padding: 20px 0 50px 0;
+    font-size: 25px;
     font-weight: 700;
+    //font-family: "Outfit Bold";
 `;
 
 const Credentials = styled.div`
@@ -31,19 +36,21 @@ const Credentials = styled.div`
     justify-content: center;
     align-items: center;
     background-color: ${COLORS.windowBackground};
-    padding: 20px;
+    padding: 25px;
     border-radius: 20px;
 `;
+
 const SpanCredentials = styled.span`
     background-color: ${COLORS.button};
     color: ${COLORS.text};
     border-width: 0;
-    border-right-width: 3px;
+    height: 45px;
+    border-right-width: 5px;
     border-color: ${COLORS.windowBackground};
 `;
 
 const InputCredentials = styled.input`
-    background-color: ${COLORS.button};
+    background-color: ${COLORS.inputBox};
     border-width: 0;
 `;
 
@@ -56,6 +63,9 @@ const Divider = styled.div`
 const Submit = styled.button`
     background-color: ${COLORS.button};
     width: 100%;
+    height: 45px;
+    margin-top: 25px;
+    margin-bottom: 25px;
     font-weight: 500;
     border-width: 0;
     &:hover {
@@ -69,7 +79,7 @@ export const AuthPage = () => {
             <Main>
                 <Divider>
                     <Credentials>
-                        <Header>Login to Pharmacy System Manager</Header>
+                        <Header>Pharmacy System Manager</Header>
                         <div className="input-group mb-3">
                             <SpanCredentials className="input-group-text" id="inputGroup-sizing-default">
                                 <FontAwesomeIcon icon={faUser} />
@@ -84,7 +94,7 @@ export const AuthPage = () => {
                             <InputCredentials type="password" className="form-control" aria-label="Sizing example input"
                                    aria-describedby="inputGroup-sizing-default"/>
                         </div>
-                        <Submit className="btn btn-primary" type="button">Sign In</Submit>
+                        <Submit className="btn btn-primary" type="button">Sign in</Submit>
                     </Credentials>
                 </Divider>
             </Main>
