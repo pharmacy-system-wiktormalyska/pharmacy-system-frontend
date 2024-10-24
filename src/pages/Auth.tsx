@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
-
+import '../App.css'
 
 const Main = styled.div`
     display: flex;
@@ -24,7 +24,7 @@ const Header = styled.div`
     padding: 20px 0 50px 0;
     font-size: 25px;
     font-weight: 700;
-    //font-family: "Outfit Bold";
+    font-family: "Outfit Bold";
 `;
 
 const Credentials = styled.div`
