@@ -3,12 +3,12 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
 import '../App.css'
-import {Main, HeaderText, Credentials, Submit, InputCredentials, SpanCredentials, Divider} from "../values/components.ts";
+import {AuthMain, HeaderText, Credentials, Submit, InputCredentials, SpanCredentials, Divider} from "../values/components.ts";
 
 export const AuthPage = () => {
     return (
         <>
-            <Main>
+            <AuthMain>
                 <Divider>
                     <Credentials>
                         <HeaderText>Pharmacy System Manager</HeaderText>
@@ -29,7 +29,7 @@ export const AuthPage = () => {
                         <Submit className="btn btn-primary" type="button">Sign in</Submit>
                     </Credentials>
                 </Divider>
-            </Main>
+            </AuthMain>
         </>
     )
 }
