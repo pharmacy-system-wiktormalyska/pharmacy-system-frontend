@@ -1,8 +1,14 @@
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Main, HeaderText, Sidebar, Logo, TabButton, AccountSection, AccountName, LogoutButton } from "../values/components.ts";
+import {useEffect} from "react";
 
 export const MainPage = () => {
+
+    useEffect(() => {
+
+    })
+
     return (
         <>
             <Main>

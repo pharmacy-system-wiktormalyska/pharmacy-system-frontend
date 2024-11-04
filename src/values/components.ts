@@ -24,7 +24,7 @@ export const HeaderText = styled.div`
     font-family: "Outfit Medium";
 `;
 
-export const Credentials = styled.div`
+export const Credentials = styled.form`
     display: flex;
     height: 100%;
     flex-direction: column;
