@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/vite-env.d.ts","./src/api/authcontext.tsx","./src/api/axios.ts","./src/pages/auth.tsx","./src/pages/main.tsx","./src/values/colors.ts","./src/values/components.ts","./src/values/types.ts"],"version":"5.6.3"}
