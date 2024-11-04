@@ -1,7 +1,9 @@
-FROM node:latest
-WORKDIR /react-docker/
-COPY public/ /react-docker/public
-COPY src/ /react-docker/src
-COPY package.json /react-docker/
+# Etap budowania
+FROM node:latest AS build
+WORKDIR /react-docker
+COPY package.json package-lock.json* /react-docker/
 RUN npm install
-CMD ["npm", "start"]
+RUN npm install serve -g
+COPY . .
+EXPOSE 8080
+CMD [ "npm", "run", "dev" ]
