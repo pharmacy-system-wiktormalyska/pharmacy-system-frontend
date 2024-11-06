@@ -135,13 +135,16 @@ export const AccountSection = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
     align-items: center;
     color: ${COLORS.text};
+    gap: 10px;
 `;
 
 export const AccountName = styled.div`
     font-size: 18px;
-    margin-bottom: 10px;
     font-family: "Outfit Regular";
 `;
 

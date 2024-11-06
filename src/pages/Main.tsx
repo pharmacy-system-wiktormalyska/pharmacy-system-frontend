@@ -31,7 +31,8 @@ export const MainPage = () => {
                 <TabButton>Tab 2</TabButton>
                 <TabButton>Tab 3</TabButton>
                 <AccountSection>
-                    <AccountName>example@mail.com</AccountName>
+                    <AccountName>{user?.firstName}</AccountName>
+                    <AccountName>{user?.lastName}</AccountName>
                     <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
 
                 </AccountSection>

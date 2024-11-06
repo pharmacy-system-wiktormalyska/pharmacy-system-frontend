@@ -9,6 +9,7 @@ import {useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import {User} from "../values/types.ts";
+import bcrypt from 'bcryptjs'
 
 const AuthPage: React.FC  = () => {
     const {login} = useAuth();
@@ -19,7 +20,28 @@ const AuthPage: React.FC  = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post<User>('/api/auth/login', {username, password})
+            if (process.env.NODE_ENV === 'development' && username === 'admin' && password === 'admin') {
+                const mockUser: User = {
+                    id: '1',
+                    post: '1',
+                    token: '9a9a9a9a',
+                    firstName: 'Admin Name',
+                    lastName: 'Admin LastName'
+                }
+                login(mockUser)
+                navigate('/')
+                return
+            }
+
+
+            const salt = await bcrypt.genSalt(10)
+            const hashedUsername = await bcrypt.hash(username, salt);
+            const hashedPassword = await bcrypt.hash(password, salt);
+
+            const response = await axios.post<User>('/api/auth/login', {
+                username: hashedUsername,
+                password: hashedPassword,
+            })
             login(response.data)
             navigate('/')
         } catch (error) {
@@ -51,7 +73,7 @@ const AuthPage: React.FC  = () => {
                                 <FontAwesomeIcon icon={faLock} />
                             </SpanCredentials>
                             <InputCredentials
-                                type="login"
+                                type="password"
                                 className="form-control"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
