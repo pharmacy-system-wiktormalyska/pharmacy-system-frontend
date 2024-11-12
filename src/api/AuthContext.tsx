@@ -1,9 +1,11 @@
 import React, {createContext, useState, useContext, ReactNode} from 'react';
 import { User } from '../values/types.ts'
+import axios from "./axios.ts";
 
 interface AuthContextType {
     user: User | null;
     login: (userData: User) => void;
+    loginByToken: (token: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -17,13 +19,40 @@ export const AuthProvider:React.FC<{ children: ReactNode }> = ({ children }) => 
         localStorage.setItem('token', userData.token);
     }
 
+    const loginByToken = async (token: string) => {
+        try {
+            //Mock user for development
+            if (process.env.NODE_ENV === 'development' && token === 'admintoken') {
+                const mockUser: User = {
+                    id: '1',
+                    post: '1',
+                    token: 'admintoken',
+                    firstName: 'Admin Name',
+                    lastName: 'Admin LastName'
+                }
+                setUser(mockUser)
+                return
+            }
+
+            const response = await axios.get<User>('/api/auth/me', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setUser(response.data);
+            } catch (error) {
+                console.error(error);
+                logout()
+        }
+    }
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('token');
     }
 
     return (
-        <AuthContext.Provider value={{user, login, logout}}>
+        <AuthContext.Provider value={{user, login, loginByToken,  logout}}>
             {children}
         </AuthContext.Provider>
     )

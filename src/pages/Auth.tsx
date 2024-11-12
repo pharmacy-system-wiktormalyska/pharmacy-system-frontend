@@ -20,11 +20,12 @@ const AuthPage: React.FC  = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            //Mock user for development
             if (process.env.NODE_ENV === 'development' && username === 'admin' && password === 'admin') {
                 const mockUser: User = {
                     id: '1',
                     post: '1',
-                    token: '9a9a9a9a',
+                    token: 'admintoken',
                     firstName: 'Admin Name',
                     lastName: 'Admin LastName'
                 }

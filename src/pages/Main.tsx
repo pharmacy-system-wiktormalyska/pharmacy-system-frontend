@@ -1,35 +1,53 @@
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Main, HeaderText, Sidebar, Logo, TabButton, AccountSection, AccountName, LogoutButton } from "../values/components.ts";
-import {useEffect} from "react";
+import { Main, Sidebar, Logo, TabButton, AccountSection, AccountName, LogoutButton } from "../values/components.ts";
+import {useEffect, useState} from "react";
 import {useAuth} from "../api/AuthContext.tsx"
 import {useNavigate} from "react-router-dom";
+import MainPanel from "./dashboards/MainPanel.tsx";
+import WarehousePanel from "./dashboards/WarehousePanel.tsx";
+import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
 
 export const MainPage = () => {
-    const {user, logout} = useAuth()
+    const {user, logout, loginByToken} = useAuth()
     const navigate = useNavigate();
 
     const handleLogout = () => {
         logout()
         navigate('/login')
     }
+
     useEffect(() => {
-        if (user === null) {
-            navigate('/login')
+        const initializeUser = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                await loginByToken(token)
+            } else {
+                navigate('/login')
+            }
         }
-    })
+        initializeUser()
+    }, [navigate, user, loginByToken])
+
+    const [currentDashboard, setCurrentDashboard] = useState<string>('MainPanel')
+
+    const switchDashboard = (dashboard: string) => {
+        setCurrentDashboard(dashboard)
+    }
 
     return (
         <>
             <Main>
-                <HeaderText style={{ color: "white"}}>Example Dashboard</HeaderText>
+                {currentDashboard === 'MainPanel' && <MainPanel />}
+                {currentDashboard === 'WarehousePanel' && <WarehousePanel />}
+                {currentDashboard === 'DepartmentPanel' && <DepartmentPanel />}
             </Main>
 
             <Sidebar>
                 <Logo/>
-                <TabButton>Tab 1</TabButton>
-                <TabButton>Tab 2</TabButton>
-                <TabButton>Tab 3</TabButton>
+                <TabButton onClick={() => switchDashboard('MainPanel')}>Main Panel</TabButton>
+                <TabButton onClick={() => switchDashboard('WarehousePanel')}>Warehouse Panel</TabButton>
+                <TabButton onClick={() => switchDashboard('DepartmentPanel')}>Department Panel</TabButton>
                 <AccountSection>
                     <AccountName>{user?.firstName}</AccountName>
                     <AccountName>{user?.lastName}</AccountName>
