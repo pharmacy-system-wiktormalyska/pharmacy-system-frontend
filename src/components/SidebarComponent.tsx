@@ -1,59 +1,41 @@
-import '../App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {useState} from "react";
-import MainPanel from "./dashboards/MainPanel.tsx";
-import WarehousePanel from "./dashboards/WarehousePanel.tsx";
-import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
 import styled from "styled-components";
 import {COLORS} from "../values/colors.ts";
+import {useNavigate} from "react-router-dom";
 
-export const MainPage = () => {
+interface SidebarProps {
+    firstName: string;
+    secondName: string;
+}
 
-    const [currentDashboard, setCurrentDashboard] = useState<string>('MainPanel')
+const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
+    const navigate = useNavigate();
 
-    const switchDashboard = (dashboard: string) => {
-        setCurrentDashboard(dashboard)
+    const logout = async () => {
+        await fetch('https://backend.pharmacy.wiktormalyska.ovh/api/logout', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include'
+        })
+        navigate('/login')
     }
 
     return (
-        <Master >
-            <Sidebar>
-                <Logo/>
-                <TabButton onClick={() => switchDashboard('MainPanel')}>Main Panel</TabButton>
-                <TabButton onClick={() => switchDashboard('WarehousePanel')}>Warehouse Panel</TabButton>
-                <TabButton onClick={() => switchDashboard('DepartmentPanel')}>Department Panel</TabButton>
-                <AccountSection>
-                    <AccountName></AccountName>
-                    <AccountName></AccountName>
-                    <LogoutButton>Logout</LogoutButton>
+        <Sidebar>
+            <Logo/>
+            <TabButton onClick={() => navigate("/")}>Main Panel</TabButton>
+            <TabButton onClick={() => navigate("/warehouse")}>Warehouse Panel</TabButton>
+            <TabButton onClick={() => navigate("/department")}>Department Panel</TabButton>
+            <AccountSection>
+                <AccountName>{firstName}</AccountName>
+                <AccountName>{secondName}</AccountName>
+                <LogoutButton onClick={() => logout()}>Logout</LogoutButton>
 
-                </AccountSection>
-            </Sidebar>
-            <Main>
-                {currentDashboard === 'MainPanel' && <MainPanel />}
-                {currentDashboard === 'WarehousePanel' && <WarehousePanel />}
-                {currentDashboard === 'DepartmentPanel' && <DepartmentPanel />}
-            </Main>
+            </AccountSection>
+        </Sidebar>
+    )
+}
 
-        </Master>
-    );
-};
-export const Master = styled.div`
-    display: flex;
-    width: 100%;
-    height: 100%;
-`
-
-export const Main = styled.div`
-    padding-top: 10px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    background-color: ${COLORS.background};
-`;
+export default SidebarComponent
 
 export const Sidebar = styled.div`
     height: 100%;

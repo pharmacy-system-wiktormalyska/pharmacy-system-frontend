@@ -3,20 +3,42 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
 import '../App.css'
-import {useState} from "react";
+import {SyntheticEvent, useState} from "react";
 import styled from "styled-components";
 import {COLORS} from "../values/colors.ts";
 import {HeaderText} from "../components/HeaderText.tsx";
+import {useNavigate} from "react-router-dom";
 
 const AuthPage: React.FC  = () => {
-    const [username, setUsername] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
+    const navigate = useNavigate()
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [redirect, setRedirect] = useState(false);
+
+    const submit = async (e: SyntheticEvent) => {
+        e.preventDefault()
+
+        await fetch('https://backend.pharmacy.wiktormalyska.ovh/api/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include',
+            body: JSON.stringify({
+                username,
+                password
+            })
+        })
+
+        setRedirect(true)
+    }
+    if (redirect) {
+        navigate('/')
+    }
 
     return (
         <>
             <AuthMain>
                 <Divider>
-                    <Credentials>
+                    <CredentialsForm onSubmit={submit}>
                         <HeaderText>Pharmacy System Manager</HeaderText>
                         <div className="input-group mb-3">
                             <SpanCredentials className="input-group-text" id="inputGroup-sizing-default">
@@ -45,7 +67,7 @@ const AuthPage: React.FC  = () => {
                             />
                         </div>
                         <Submit className="btn btn-primary" type="submit">Sign in</Submit>
-                    </Credentials>
+                    </CredentialsForm>
                 </Divider>
             </AuthMain>
         </>
@@ -66,7 +88,7 @@ const AuthMain = styled.div`
     background-position: center;
     background-repeat: no-repeat;
 `;
-export const Credentials = styled.form`
+export const CredentialsForm = styled.form`
     display: flex;
     height: 100%;
     flex-direction: column;

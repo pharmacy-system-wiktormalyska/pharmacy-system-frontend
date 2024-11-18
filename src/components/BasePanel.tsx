@@ -9,6 +9,7 @@ interface BasePanelProps {
 }
 
 const BasePanel: React.FC<BasePanelProps> = ({ title, children, panelKey }) => {
+
     return (
         <div key={panelKey}>
             <Columns>

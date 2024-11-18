@@ -1,12 +1,14 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { createBrowserRouter, RouterProvider as Router } from 'react-router-dom';
-import {MainPage} from "./pages/Main.tsx";
-import AuthPage from "./pages/Auth.tsx";
+import {createBrowserRouter, RouterProvider as Router} from 'react-router-dom'
+import {MainPage} from "./pages/Home.tsx"
+import AuthPage from "./pages/Auth.tsx"
+import {StrictMode} from "react";
 
+// Router configuration to define if login or anything else
 const router = createBrowserRouter([
     {
-        path: '/',
+        path: '*',
         element: <MainPage />,
     },
     {
@@ -16,5 +18,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')!).render(
-     <Router router={router} />
+    <StrictMode>
+        <Router router={router} />
+    </StrictMode>
 )
