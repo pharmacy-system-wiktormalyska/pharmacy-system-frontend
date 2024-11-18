@@ -6,3 +6,8 @@ export interface User {
     post: string;
     roles : string[];
 }
+
+export interface RoleAndAccess {
+    role: string;
+    panelKey: string[];
+}

@@ -1,7 +1,7 @@
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useEffect, useState} from "react";
-import {useAuth} from "../api/AuthContext.tsx"
+import {UseAuth} from "../api/AuthContext.tsx"
 import {useNavigate} from "react-router-dom";
 import MainPanel from "./dashboards/MainPanel.tsx";
 import WarehousePanel from "./dashboards/WarehousePanel.tsx";
@@ -10,7 +10,7 @@ import styled from "styled-components";
 import {COLORS} from "../values/colors.ts";
 
 export const MainPage = () => {
-    const {user, logout, loginByToken} = useAuth()
+    const {user, logout, loginByToken} = UseAuth()
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -22,13 +22,13 @@ export const MainPage = () => {
         const initializeUser = async () => {
             const token = localStorage.getItem('token');
             if (token) {
-                await loginByToken(token)
+                await loginByToken(token);
             } else {
-                navigate('/login')
+                navigate('/login');
             }
-        }
-        initializeUser()
-    }, [navigate, user, loginByToken])
+        };
+        initializeUser();
+    }, [navigate, loginByToken]);
 
     const [currentDashboard, setCurrentDashboard] = useState<string>('MainPanel')
 
@@ -37,13 +37,7 @@ export const MainPage = () => {
     }
 
     return (
-        <>
-            <Main>
-                {currentDashboard === 'MainPanel' && <MainPanel />}
-                {currentDashboard === 'WarehousePanel' && <WarehousePanel />}
-                {currentDashboard === 'DepartmentPanel' && <DepartmentPanel />}
-            </Main>
-
+        <Master >
             <Sidebar>
                 <Logo/>
                 <TabButton onClick={() => switchDashboard('MainPanel')}>Main Panel</TabButton>
@@ -56,27 +50,34 @@ export const MainPage = () => {
 
                 </AccountSection>
             </Sidebar>
-        </>
+            <Main>
+                {currentDashboard === 'MainPanel' && <MainPanel />}
+                {currentDashboard === 'WarehousePanel' && <WarehousePanel />}
+                {currentDashboard === 'DepartmentPanel' && <DepartmentPanel />}
+            </Main>
+
+        </Master>
     );
 };
+export const Master = styled.div`
+    display: flex;
+    width: 100%;
+    height: 100%;
+`
 
 export const Main = styled.div`
-    padding-left: 290px;
     padding-top: 10px;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
     flex-direction: column;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     background-color: ${COLORS.background};
 `;
 
 export const Sidebar = styled.div`
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
+    height: 100%;
     width: 250px;
     display: flex;
     flex-direction: column;
@@ -85,7 +86,7 @@ export const Sidebar = styled.div`
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    padding: 20px;
+    padding: 10px;
 `;
 
 export const Logo = styled.div`

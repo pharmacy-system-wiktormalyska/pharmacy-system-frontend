@@ -1,11 +1,12 @@
-import {HeaderText} from "../../components/HeaderText.tsx";
+import BasePanel from "../../components/BasePanel.tsx";
 
 
 const MainPanel = () => {
     return (
-        <>
-            <HeaderText style={{color: "white"}}>Main Panel</HeaderText>
-        </>
+        <BasePanel title="Main Panel" key={"main"}>
+            <>
+            </>
+        </BasePanel>
     )
 }
 

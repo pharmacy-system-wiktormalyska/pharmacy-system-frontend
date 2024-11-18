@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
 import '../App.css'
-import {useAuth} from "../api/AuthContext.tsx";
+import {UseAuth} from "../api/AuthContext.tsx";
 import {useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
@@ -14,7 +14,7 @@ import {COLORS} from "../values/colors.ts";
 import {HeaderText} from "../components/HeaderText.tsx";
 
 const AuthPage: React.FC  = () => {
-    const {login} = useAuth();
+    const {login} = UseAuth();
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const navigate = useNavigate();
