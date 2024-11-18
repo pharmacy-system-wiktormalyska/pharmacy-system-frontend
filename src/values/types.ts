@@ -4,4 +4,5 @@ export interface User {
     lastName: string;
     token: string;
     post: string;
+    roles : string[];
 }

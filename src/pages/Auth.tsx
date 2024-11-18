@@ -3,13 +3,15 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
 import '../App.css'
-import {AuthMain, HeaderText, Credentials, Submit, InputCredentials, SpanCredentials, Divider} from "../values/components.ts";
 import {useAuth} from "../api/AuthContext.tsx";
 import {useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import {User} from "../values/types.ts";
 import bcrypt from 'bcryptjs'
+import styled from "styled-components";
+import {COLORS} from "../values/colors.ts";
+import {HeaderText} from "../components/HeaderText.tsx";
 
 const AuthPage: React.FC  = () => {
     const {login} = useAuth();
@@ -27,7 +29,8 @@ const AuthPage: React.FC  = () => {
                     post: '1',
                     token: 'admintoken',
                     firstName: 'Admin Name',
-                    lastName: 'Admin LastName'
+                    lastName: 'Admin LastName',
+                    roles: ['admin']
                 }
                 login(mockUser)
                 navigate('/')
@@ -91,3 +94,62 @@ const AuthPage: React.FC  = () => {
 }
 
 export default AuthPage
+
+const AuthMain = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    background-image: url('/src/assets/images/waves-bg.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+`;
+export const Credentials = styled.form`
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    background-color: ${COLORS.windowBackground};
+    padding: 25px;
+    border-radius: 20px;
+`;
+
+export const Submit = styled.button`
+    background-color: ${COLORS.button};
+    width: 100%;
+    height: 45px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    font-family: "Outfit Medium", serif;
+    border-width: 0;
+    &:hover {
+        background-color: ${COLORS.buttonHover};
+    }
+`;
+
+export const SpanCredentials = styled.span`
+    background-color: ${COLORS.button};
+    color: ${COLORS.text};
+    border-width: 0;
+    height: 45px;
+    border-right-width: 5px;
+    border-color: ${COLORS.windowBackground};
+`;
+
+export const InputCredentials = styled.input`
+    background-color: ${COLORS.inputBox};
+    border-width: 0;
+    font-family: "Outfit Regular", serif;
+`;
+
+export const Divider = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;

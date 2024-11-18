@@ -1,4 +1,5 @@
-import {HeaderText} from "../../values/components.ts";
+import {HeaderText} from "../../components/HeaderText.tsx";
+
 
 const MainPanel = () => {
     return (
