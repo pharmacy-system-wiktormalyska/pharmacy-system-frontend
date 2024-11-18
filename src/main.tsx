@@ -3,7 +3,6 @@ import './index.css'
 import { createBrowserRouter, RouterProvider as Router } from 'react-router-dom';
 import {MainPage} from "./pages/Main.tsx";
 import AuthPage from "./pages/Auth.tsx";
-import {AuthProvider} from "./api/AuthContext.tsx";
 
 const router = createBrowserRouter([
     {
@@ -17,7 +16,5 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')!).render(
- <AuthProvider>
      <Router router={router} />
- </AuthProvider>
 )
