@@ -7,6 +7,7 @@ interface AuthContextType {
     login: (userData: User) => void;
     loginByToken: (token: string) => Promise<void>;
     logout: () => void;
+    getUserRoles: () => string[] | undefined;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,7 +29,8 @@ export const AuthProvider:React.FC<{ children: ReactNode }> = ({ children }) => 
                     post: '1',
                     token: 'admintoken',
                     firstName: 'Admin Name',
-                    lastName: 'Admin LastName'
+                    lastName: 'Admin LastName',
+                    roles: ['admin']
                 }
                 setUser(mockUser)
                 return
@@ -51,8 +53,13 @@ export const AuthProvider:React.FC<{ children: ReactNode }> = ({ children }) => 
         localStorage.removeItem('token');
     }
 
+    const getUserRoles = () => {
+        loginByToken(localStorage.getItem('token') || '')
+        return user?.roles
+    }
+
     return (
-        <AuthContext.Provider value={{user, login, loginByToken,  logout}}>
+        <AuthContext.Provider value={{user, login, loginByToken,  logout , getUserRoles}}>
             {children}
         </AuthContext.Provider>
     )
