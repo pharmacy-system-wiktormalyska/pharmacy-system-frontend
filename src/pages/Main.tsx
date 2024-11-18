@@ -1,8 +1,6 @@
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {useEffect, useState} from "react";
-import {UseAuth} from "../api/AuthContext.tsx"
-import {useNavigate} from "react-router-dom";
+import {useState} from "react";
 import MainPanel from "./dashboards/MainPanel.tsx";
 import WarehousePanel from "./dashboards/WarehousePanel.tsx";
 import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
@@ -10,25 +8,6 @@ import styled from "styled-components";
 import {COLORS} from "../values/colors.ts";
 
 export const MainPage = () => {
-    const {user, logout, loginByToken} = UseAuth()
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logout()
-        navigate('/login')
-    }
-
-    useEffect(() => {
-        const initializeUser = async () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                await loginByToken(token);
-            } else {
-                navigate('/login');
-            }
-        };
-        initializeUser();
-    }, [navigate, loginByToken]);
 
     const [currentDashboard, setCurrentDashboard] = useState<string>('MainPanel')
 
@@ -44,9 +23,9 @@ export const MainPage = () => {
                 <TabButton onClick={() => switchDashboard('WarehousePanel')}>Warehouse Panel</TabButton>
                 <TabButton onClick={() => switchDashboard('DepartmentPanel')}>Department Panel</TabButton>
                 <AccountSection>
-                    <AccountName>{user?.firstName}</AccountName>
-                    <AccountName>{user?.lastName}</AccountName>
-                    <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+                    <AccountName></AccountName>
+                    <AccountName></AccountName>
+                    <LogoutButton>Logout</LogoutButton>
 
                 </AccountSection>
             </Sidebar>

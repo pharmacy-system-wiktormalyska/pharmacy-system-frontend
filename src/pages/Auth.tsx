@@ -3,61 +3,20 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
 import '../App.css'
-import {UseAuth} from "../api/AuthContext.tsx";
 import {useState} from "react";
-import { useNavigate } from 'react-router-dom';
-import axios from "axios";
-import {User} from "../values/types.ts";
-import bcrypt from 'bcryptjs'
 import styled from "styled-components";
 import {COLORS} from "../values/colors.ts";
 import {HeaderText} from "../components/HeaderText.tsx";
 
 const AuthPage: React.FC  = () => {
-    const {login} = UseAuth();
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const navigate = useNavigate();
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            //Mock user for development
-            if (process.env.NODE_ENV === 'development' && username === 'admin' && password === 'admin') {
-                const mockUser: User = {
-                    id: '1',
-                    post: '1',
-                    token: 'admintoken',
-                    firstName: 'Admin Name',
-                    lastName: 'Admin LastName',
-                    roles: ['admin']
-                }
-                login(mockUser)
-                navigate('/')
-                return
-            }
-
-
-            const salt = await bcrypt.genSalt(10)
-            const hashedUsername = await bcrypt.hash(username, salt);
-            const hashedPassword = await bcrypt.hash(password, salt);
-
-            const response = await axios.post<User>('/api/auth/login', {
-                username: hashedUsername,
-                password: hashedPassword,
-            })
-            login(response.data)
-            navigate('/')
-        } catch (error) {
-            console.error(error)
-        }
-    }
 
     return (
         <>
             <AuthMain>
                 <Divider>
-                    <Credentials onSubmit={handleSubmit}>
+                    <Credentials>
                         <HeaderText>Pharmacy System Manager</HeaderText>
                         <div className="input-group mb-3">
                             <SpanCredentials className="input-group-text" id="inputGroup-sizing-default">
