@@ -4,7 +4,7 @@ import MainPanel from "./dashboards/MainPanel.tsx";
 import WarehousePanel from "./dashboards/WarehousePanel.tsx";
 import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
 import styled from "styled-components";
-import {COLORS} from "../values/colors.ts";
+import colorPalette from "../values/colors.ts";
 import SidebarComponent from "../components/SidebarComponent.tsx";
 import {Routes, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
@@ -48,13 +48,12 @@ export const Master = styled.div`
 `
 
 export const SwappableComponent = styled.div`
-    padding: 10px;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    background-color: ${COLORS.background};
+    background-color: ${colorPalette.background.hex};
 `;
 

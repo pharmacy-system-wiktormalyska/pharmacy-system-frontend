@@ -5,7 +5,7 @@ import {faLock} from '@fortawesome/free-solid-svg-icons'
 import '../App.css'
 import {SyntheticEvent, useState} from "react";
 import styled from "styled-components";
-import {COLORS} from "../values/colors.ts";
+import colorPalette from "../values/colors.ts";
 import {HeaderText} from "../components/HeaderText.tsx";
 import {useNavigate} from "react-router-dom";
 
@@ -96,13 +96,13 @@ export const CredentialsForm = styled.form`
     align-content: center;
     justify-content: center;
     align-items: center;
-    background-color: ${COLORS.windowBackground};
+    background-color: ${colorPalette.windowBackground.hex};
     padding: 25px;
     border-radius: 20px;
 `;
 
 export const Submit = styled.button`
-    background-color: ${COLORS.button};
+    background-color: ${colorPalette.button.hex};
     width: 100%;
     height: 45px;
     margin-top: 25px;
@@ -110,21 +110,21 @@ export const Submit = styled.button`
     font-family: "Outfit Medium", serif;
     border-width: 0;
     &:hover {
-        background-color: ${COLORS.buttonHover};
+        background-color: ${colorPalette.buttonHover.hex};
     }
 `;
 
 export const SpanCredentials = styled.span`
-    background-color: ${COLORS.button};
-    color: ${COLORS.text};
+    background-color: ${colorPalette.button.hex};
+    color: ${colorPalette.text.hex};
     border-width: 0;
     height: 45px;
     border-right-width: 5px;
-    border-color: ${COLORS.windowBackground};
+    border-color: ${colorPalette.windowBackground.hex};
 `;
 
 export const InputCredentials = styled.input`
-    background-color: ${COLORS.inputBox};
+    background-color: ${colorPalette.inputBox.hex};
     border-width: 0;
     font-family: "Outfit Regular", serif;
 `;

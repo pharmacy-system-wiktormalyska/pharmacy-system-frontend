@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import {COLORS} from "../values/colors.ts";
 import {useNavigate} from "react-router-dom";
+import colorPalette from "../values/colors.ts";
 
 interface SidebarProps {
     firstName: string;
@@ -66,14 +66,14 @@ export const TabButton = styled.button`
     width: 100%;
     padding: 15px;
     margin: 5px 0;
-    color: ${COLORS.text};
-    background-color: ${COLORS.button};
+    color: ${colorPalette.text.hex};
+    background-color: ${colorPalette.button.hex};
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-family: "Outfit Medium", serif;
     &:hover {
-        background-color: ${COLORS.buttonHover};
+        background-color: ${colorPalette.buttonHover.hex};
     }
 `;
 
@@ -86,7 +86,7 @@ export const AccountSection = styled.div`
     align-content: center;
     justify-content: center;
     align-items: center;
-    color: ${COLORS.text};
+    color: ${colorPalette.text.hex};
     gap: 10px;
 `;
 
@@ -98,13 +98,13 @@ export const AccountName = styled.div`
 export const LogoutButton = styled.button`
     width: 80%;
     padding: 10px;
-    color: ${COLORS.text};
-    background-color: ${COLORS.button};
+    color: ${colorPalette.text.hex};
+    background-color: ${colorPalette.button.hex};
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-family: "Outfit Medium", serif;
     &:hover {
-        background-color: ${COLORS.buttonHover};
+        background-color: ${colorPalette.buttonHover.hex};
     }
 `;

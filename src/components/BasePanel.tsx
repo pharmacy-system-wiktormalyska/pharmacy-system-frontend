@@ -1,6 +1,6 @@
 import React from 'react';
-import { HeaderText } from './HeaderText.tsx';
 import styled from "styled-components";
+import colorPalette from "../values/colors.ts";
 
 interface BasePanelProps {
     title: string;
@@ -11,18 +11,39 @@ interface BasePanelProps {
 const BasePanel: React.FC<BasePanelProps> = ({ title, children, panelKey }) => {
 
     return (
-        <div key={panelKey}>
+        <>
+            <Header>
+                <HeaderText key={panelKey} style={{ color: "white" }}>{title}</HeaderText>
+            </Header>
             <Columns>
-                <HeaderText style={{ color: "white" }}>{title}</HeaderText>
+
                 {children}
             </Columns>
-        </div>
+        </>
     );
 }
 
 export default BasePanel;
 
+const Header = styled.div`
+    display: flex;
+    width: 100%;
+    background-color: ${colorPalette.header.hex};
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0 0 1rem 0;
+`
+
 const Columns = styled.div`
     display: flex;
     padding: 0 10 px 0 10px;
 `
+
+const HeaderText = styled.div`
+    color: ${colorPalette.darkText.hex};
+    padding: 1rem 0;
+    font-size: 25px;
+    font-family: "Outfit Medium", sans-serif;
+`;
