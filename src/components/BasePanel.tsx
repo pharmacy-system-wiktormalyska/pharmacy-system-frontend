@@ -38,8 +38,11 @@ const Header = styled.div`
 
 const Columns = styled.div`
     display: flex;
-    padding: 0 10 px 0 10px;
-`
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+`;
 
 const HeaderText = styled.div`
     color: ${colorPalette.darkText.hex};
