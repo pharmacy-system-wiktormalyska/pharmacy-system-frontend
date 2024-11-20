@@ -2,7 +2,7 @@ interface Color {
     hex: string;
 }
 
-const colorPalette: { [key in 'background' | 'windowBackground' | 'sidebar' | 'header' | 'inputBox' | 'button' | 'buttonHover' | 'text' | 'darkText']: Color } = {
+const colorPalette: { [key in 'background' | 'windowBackground' | 'sidebar' | 'header' | 'inputBox' | 'button' | 'buttonHover' | 'text' | 'darkText' | 'lightBackground' | 'lightBackgroundShadow']: Color } = {
     background: { hex: "#00051f" },
     windowBackground: { hex: "#f1f2f6"},
     sidebar: { hex: "#000833"},
@@ -12,6 +12,8 @@ const colorPalette: { [key in 'background' | 'windowBackground' | 'sidebar' | 'h
     buttonHover: { hex: '#003f88'},             // lighter blue button hover
     text: { hex: '#f1f2f6'},                    // white text
     darkText: { hex: '#00072d'},
+    lightBackground: { hex: '#f1f2f6'},
+    lightBackgroundShadow: { hex: '#e0e0e0'}
 };
 
 export default colorPalette;

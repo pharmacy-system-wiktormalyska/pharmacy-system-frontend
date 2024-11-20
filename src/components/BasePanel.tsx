@@ -15,19 +15,26 @@ const BasePanel: React.FC<BasePanelProps> = ({ title, children, panelKey }) => {
             <Header>
                 <HeaderText key={panelKey} style={{ color: "white" }}>{title}</HeaderText>
             </Header>
-            <Columns>
-
-                {children}
-            </Columns>
+            <Background>
+                <Columns>
+                    {children}
+                </Columns>
+            </Background>
         </>
     );
 }
 
 export default BasePanel;
 
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-color: ${colorPalette.header.hex};
+`
+
 const Header = styled.div`
     display: flex;
-    width: 100%;
+    width: calc(100% - 1rem);
     background-color: ${colorPalette.header.hex};
     flex-direction: row;
     align-content: center;
@@ -38,10 +45,16 @@ const Header = styled.div`
 
 const Columns = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     width: 100%;
+    height: 100%;
+    padding: 1rem;
+    background-color: ${colorPalette.background.hex};
+    border-top-left-radius: 1rem;
+    flex-wrap: nowrap;
+    gap: 1rem;
 `;
 
 const HeaderText = styled.div`
