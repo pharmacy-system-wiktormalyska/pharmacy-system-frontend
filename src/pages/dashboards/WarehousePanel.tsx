@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import BasePanel from "../../components/BasePanel";
+import colorPalette from "../../values/colors.ts";
 
 const WarehousePanel = () => {
     const [activeTab, setActiveTab] = useState<'warehouse' | 'requestList'>('warehouse');
@@ -101,6 +102,7 @@ const CenteredContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
+    height: 100%;
 `;
 
 
@@ -126,7 +128,7 @@ const StyledTable = styled.table`
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background-color: #f1f2f6;
+    background-color: ${colorPalette.lightBackground.hex};
     border-radius: 10px;
     overflow: hidden;
 
@@ -135,11 +137,11 @@ const StyledTable = styled.table`
         text-align: center;
         font-family: "Outfit Regular", sans-serif;
         color: #000;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid ${colorPalette.lightBackgroundShadow.hex};
     }
 
     th {
-        background-color: #e6e6e6;
+        background-color: ${colorPalette.lightBackgroundShadow.hex};
         font-size: 16px;
     }
 
