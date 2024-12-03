@@ -2,24 +2,45 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
+import { AiOutlineClose } from 'react-icons/ai';
+
+interface WarehouseItem {
+    name: string;
+    number: string;
+    expiry: string;
+    price: string;
+    stock: number;
+    description: string;
+}
+
+interface RequestItem {
+    name: string;
+    pharmacist: string;
+    quantity: number;
+    stock: number;
+    description: string;
+}
 
 const WarehousePanel = () => {
     const [activeTab, setActiveTab] = useState<'warehouse' | 'requestList'>('warehouse');
+    const [selectedDetails, setSelectedDetails] = useState<WarehouseItem | RequestItem | null>(null);
 
-    const warehouseData = [
-        { name: 'Medicine A', number: '001', expiry: '2024-12-31', price: '25 zł', details: 'Details about Item 1' },
-        { name: 'Medicine B', number: '002', expiry: '2025-06-30', price: '40 zł', details: 'Details about Item 2' },
+    const warehouseData: WarehouseItem[] = [
+        { name: 'Estradiol Valerate', number: 'EV001', expiry: '2025-08-15', price: '120 zł', stock: 200, description: 'A long-acting estrogen used in feminizing hormone replacement therapy :3' },
+        { name: 'Ibuprofen 400mg', number: 'IB002', expiry: '2026-01-10', price: '15 zł', stock: 500, description: 'A common pain reliever used to treat inflammation, headaches, and minor aches' },
     ];
 
-    const requestListData = [
-        { name: 'Medicine C', pharmacist: 'Jane Doe', quantity: 10 },
-        { name: 'Medicine D', pharmacist: 'Ellen Joe', quantity: 5 },
+    const requestListData: RequestItem[] = [
+        { name: 'Paracetamol 500mg', pharmacist: 'Eula Lawrence', quantity: 10, stock: 50, description: 'Widely used for relieving mild to moderate pain and reducing fever' },
+        { name: 'Metformin 500mg', pharmacist: 'Miracle Johnson', quantity: 5, stock: 85, description: 'Used to manage type 2 diabetes by controlling blood sugar levels' },
     ];
+
+    const openDetails = (item: WarehouseItem | RequestItem) => setSelectedDetails(item);
+    const closeDetails = () => setSelectedDetails(null);
 
     return (
         <BasePanel title="Warehouse Panel" panelKey="warehouse">
             <CenteredContainer>
-                {}
                 <ButtonGroup>
                     <TabButton
                         active={activeTab === 'warehouse'}
@@ -35,7 +56,6 @@ const WarehousePanel = () => {
                     </TabButton>
                 </ButtonGroup>
 
-                {}
                 <StyledTableContainer>
                     <StyledTable>
                         <thead>
@@ -46,7 +66,6 @@ const WarehousePanel = () => {
                                     <th>Number</th>
                                     <th>Expiry Date</th>
                                     <th>Price</th>
-                                    <th>Details</th>
                                     <th>Action</th>
                                 </>
                             )}
@@ -68,9 +87,9 @@ const WarehousePanel = () => {
                                     <td>{item.number}</td>
                                     <td>{item.expiry}</td>
                                     <td>{item.price}</td>
-                                    <td>{item.details}</td>
                                     <td>
                                         <ActionButton>Order</ActionButton>
+                                        <DetailsButton onClick={() => openDetails(item)}>Details</DetailsButton>
                                     </td>
                                 </tr>
                             ))}
@@ -82,13 +101,38 @@ const WarehousePanel = () => {
                                     <td>{request.quantity}</td>
                                     <td>
                                         <ActionButton>Order</ActionButton>
-                                        <RejectButton>Reject</RejectButton>
+                                        <RejectButton onClick={() => alert(`Request for ${request.name} rejected.`)}>Reject</RejectButton>
+                                        <DetailsButton onClick={() => openDetails(request)}>Details</DetailsButton>
                                     </td>
                                 </tr>
                             ))}
+
                         </tbody>
                     </StyledTable>
                 </StyledTableContainer>
+
+                {selectedDetails && (
+                    <PopupOverlay onClick={closeDetails}>
+                        <PopupContainer onClick={(e) => e.stopPropagation()}>
+                            <PopupHeader>
+                                <CloseButton onClick={closeDetails}>
+                                    <AiOutlineClose />
+                                </CloseButton>
+                            </PopupHeader>
+                            <PopupContent>
+                                <h3>{selectedDetails.name}</h3>
+                                <p>
+                                    <strong>Stock</strong>
+                                    {selectedDetails.stock}
+                                </p>
+                                <p>
+                                    <strong>Description</strong>
+                                    {selectedDetails.description}
+                                </p>
+                            </PopupContent>
+                        </PopupContainer>
+                    </PopupOverlay>
+                )}
             </CenteredContainer>
         </BasePanel>
     );
@@ -203,5 +247,92 @@ const RejectButton = styled(ActionButton)`
 
     &:hover {
         background-color: #d32f2f;
+    }
+`;
+
+
+const DetailsButton = styled(ActionButton)`
+    background-color: #2196F3;
+
+    &:hover {
+        background-color: #1976D2;
+    }
+`;
+
+
+const PopupOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+`;
+
+
+const PopupContainer = styled.div`
+    background-color: ${colorPalette.windowBackground.hex};
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    height: auto;
+    color: ${colorPalette.darkText.hex};
+`;
+
+
+const PopupHeader = styled.div`
+    display: flex;
+    justify-content: flex-end;
+`;
+
+
+const CloseButton = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: ${colorPalette.darkText.hex};
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+
+const PopupContent = styled.div`
+    margin-top: 20px;
+
+    h3 {
+        font-size: 28px;
+        font-family: "Outfit Medium", sans-serif;
+        margin-bottom: 35px;
+        text-align: center;
+    }
+
+    h3::after {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: ${colorPalette.contrastingLightGray.hex};
+        margin-top: 20px;
+    }
+
+    p {
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 20px;
+        font-family: "Outfit Light", sans-serif;
+    }
+
+    p strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 20px;
+        font-family: "Outfit Regular", sans-serif;
     }
 `;
