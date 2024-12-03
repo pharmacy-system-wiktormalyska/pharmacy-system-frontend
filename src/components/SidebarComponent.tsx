@@ -23,6 +23,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
         <Sidebar>
             <Logo/>
             <TabButton onClick={() => navigate("/")}>Main Panel</TabButton>
+            <TabButton onClick={() => navigate("/prescription")}>Prescription Panel</TabButton>
             <TabButton onClick={() => navigate("/warehouse")}>Warehouse Panel</TabButton>
             <TabButton onClick={() => navigate("/department")}>Department Panel</TabButton>
             <AccountSection>

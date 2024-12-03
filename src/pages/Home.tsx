@@ -8,6 +8,7 @@ import colorPalette from "../values/colors.ts";
 import SidebarComponent from "../components/SidebarComponent.tsx";
 import {Routes, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
+import PrescriptionPanel from "./dashboards/PrescriptionPanel.tsx";
 export const MainPage = () => {
     const [name, setName] = useState('');
     const [surName, setSurName] = useState('');
@@ -33,6 +34,7 @@ export const MainPage = () => {
             <SwappableComponent>
                     <Routes>
                         <Route path="*" element={<MainPanel/>}/>
+                        <Route path="/prescription" element={<PrescriptionPanel/>}/>
                         <Route path="/warehouse" element={<WarehousePanel/>}/>
                         <Route path="/department" element={<DepartmentPanel/>}/>
                     </Routes>
