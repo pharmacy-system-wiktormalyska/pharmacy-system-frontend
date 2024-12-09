@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom";
 import colorPalette from "../values/colors.ts";
 import {getRoleByID, roleHasAccess, rolesGetter} from "../values/RolesGetter.tsx";
 import React, {useState} from "react";
+import {url} from "../values/BackendValues.tsx";
 
 interface SidebarProps {
     firstName: string;
@@ -18,7 +19,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
     };
 
     const logout = async () => {
-        await fetch('https://backend.pharmacy.wiktormalyska.ovh/auth/logout', {
+        await fetch(url+"/auth/logout", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include'
