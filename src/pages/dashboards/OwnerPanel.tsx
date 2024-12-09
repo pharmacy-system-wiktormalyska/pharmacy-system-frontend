@@ -1,13 +1,13 @@
 import BasePanel from "../../components/BasePanel.tsx";
 
 
-const MainPanel = () => {
+const OwnerPanel = () => {
     return (
-        <BasePanel title="Main Panel" key={"main"}>
+        <BasePanel title="Owner Paanel" key={"owner"}>
             <>
             </>
         </BasePanel>
     )
 }
 
-export default MainPanel
+export default OwnerPanel

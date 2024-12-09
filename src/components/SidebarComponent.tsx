@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import {useNavigate} from "react-router-dom";
 import colorPalette from "../values/colors.ts";
+import {getRoleByID, roleHasAccess, rolesGetter} from "../values/RolesGetter.tsx";
+import React, {useState} from "react";
 
 interface SidebarProps {
     firstName: string;
@@ -8,10 +10,15 @@ interface SidebarProps {
 }
 
 const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
+    const [selectedRole, setSelectedRole] = useState<number>(rolesGetter[0].id);
+
+    const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedRole(Number(event.target.value));
+    };
 
     const logout = async () => {
-        await fetch('https://backend.pharmacy.wiktormalyska.ovh/api/logout', {
+        await fetch('https://backend.pharmacy.wiktormalyska.ovh/auth/logout', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include'
@@ -19,24 +26,38 @@ const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
         navigate('/login')
     }
 
+    const role = getRoleByID(selectedRole);
     return (
         <Sidebar>
-            <Logo/>
-            <TabButton onClick={() => navigate("/")}>Main Panel</TabButton>
-            <TabButton onClick={() => navigate("/prescription")}>Prescription Panel</TabButton>
-            <TabButton onClick={() => navigate("/warehouse")}>Warehouse Panel</TabButton>
-            <TabButton onClick={() => navigate("/department")}>Department Panel</TabButton>
+            <Logo />
+            {role && roleHasAccess(role, "*") && <TabButton onClick={() => navigate("/")}>Owner Panel</TabButton>}
+            {role && roleHasAccess(role, "prescription") && <TabButton onClick={() => navigate("/prescription")}>Prescription Panel</TabButton>}
+            {role && roleHasAccess(role, "warehouse_edit") && <TabButton onClick={() => navigate("/warehouse")}>Warehouse Panel</TabButton>}
+            {role && roleHasAccess(role, "department") && <TabButton onClick={() => navigate("/department")}>Department Panel</TabButton>}
+
+            {/*TODO: Mockowany wybór*/ }
+            <RoleSelector value={selectedRole} onChange={handleRoleChange}>
+                {rolesGetter.map(role => (
+                    <option key={role.id} value={role.id}>{role.name}</option>
+                ))}
+            </RoleSelector>
+
             <AccountSection>
                 <AccountName>{firstName}</AccountName>
                 <AccountName>{secondName}</AccountName>
                 <LogoutButton onClick={() => logout()}>Logout</LogoutButton>
-
             </AccountSection>
+
         </Sidebar>
     )
 }
 
 export default SidebarComponent
+
+const RoleSelector = styled.select`
+    color: black;
+    background-color: white;
+`
 
 export const Sidebar = styled.div`
     height: 100%;

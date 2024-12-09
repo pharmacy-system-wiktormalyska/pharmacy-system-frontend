@@ -1,6 +1,6 @@
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import MainPanel from "./dashboards/MainPanel.tsx";
+import OwnerPanel from "./dashboards/OwnerPanel.tsx";
 import WarehousePanel from "./dashboards/WarehousePanel.tsx";
 import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
 import styled from "styled-components";
@@ -33,7 +33,7 @@ export const MainPage = () => {
             <SidebarComponent firstName={name} secondName={surName}/>
             <SwappableComponent>
                     <Routes>
-                        <Route path="*" element={<MainPanel/>}/>
+                        <Route path="*" element={<OwnerPanel/>}/>
                         <Route path="/prescription" element={<PrescriptionPanel/>}/>
                         <Route path="/warehouse" element={<WarehousePanel/>}/>
                         <Route path="/department" element={<DepartmentPanel/>}/>
