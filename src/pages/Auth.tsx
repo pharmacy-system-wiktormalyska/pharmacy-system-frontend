@@ -18,7 +18,7 @@ const AuthPage: React.FC  = () => {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault()
 
-        await fetch('https://backend.pharmacy.wiktormalyska.ovh/api/login', {
+        await fetch('https://backend.pharmacy.wiktormalyska.ovh/auth/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',
