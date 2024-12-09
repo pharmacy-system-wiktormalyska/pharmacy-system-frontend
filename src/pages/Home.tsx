@@ -9,13 +9,14 @@ import SidebarComponent from "../components/SidebarComponent.tsx";
 import {Routes, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PrescriptionPanel from "./dashboards/PrescriptionPanel.tsx";
+import {url} from "../values/BackendValues.tsx";
 export const MainPage = () => {
     const [name, setName] = useState('');
     const [surName, setSurName] = useState('');
     useEffect(() => {
         (
             async () => {
-                 const response = await fetch('https://backend.pharmacy.wiktormalyska.ovh/api/user', {
+                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {'Content-Type': 'application/json'},
                     credentials: 'include'

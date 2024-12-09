@@ -8,6 +8,7 @@ import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 import {HeaderText} from "../components/HeaderText.tsx";
 import {useNavigate} from "react-router-dom";
+import {url} from "../values/BackendValues.tsx";
 
 const AuthPage: React.FC  = () => {
     const navigate = useNavigate()
@@ -18,7 +19,7 @@ const AuthPage: React.FC  = () => {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault()
 
-        await fetch('https://backend.pharmacy.wiktormalyska.ovh/auth/login', {
+        const response = await fetch(url+"/auth/login", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',
@@ -28,7 +29,15 @@ const AuthPage: React.FC  = () => {
             })
         })
 
-        setRedirect(true)
+        const data = await response.json();
+        console.log('Response:', response);
+        console.log('Data:', data);
+
+        if (response.ok) {
+            setRedirect(true);
+        } else {
+            console.error('Login failed:', data);
+        }
     }
     if (redirect) {
         navigate('/')
