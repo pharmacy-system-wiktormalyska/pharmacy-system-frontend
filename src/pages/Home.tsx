@@ -6,28 +6,26 @@ import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
 import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 import SidebarComponent from "../components/SidebarComponent.tsx";
-import {Routes, Route} from "react-router-dom";
+import {Routes, Route, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PrescriptionPanel from "./dashboards/PrescriptionPanel.tsx";
-import {url} from "../values/BackendValues.tsx";
+import {useAuth} from "../auth/AuthContext.tsx";
+import {useJwt} from "react-jwt";
 export const MainPage = () => {
-    const [name, setName] = useState('');
-    const [surName, setSurName] = useState('');
-    useEffect(() => {
-        (
-            async () => {
-                 const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'include'
-                })
-                const content = await response.json()
-                setName(content.name)
-                setSurName(content.surname)
-            }
-        )()
-    }, []);
+    const [name] = useState('');
+    const [surName] = useState('');
+    const {setStoredDecodedToken, isAuthenticated, token, storedDecodedToken} = useAuth()
+    const {decodedToken} = useJwt(token as string)
+    const navigate = useNavigate()
 
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate("/login")
+        }
+        setStoredDecodedToken(decodedToken as string)
+        console.log(storedDecodedToken)
+    }, [navigate, isAuthenticated, setStoredDecodedToken, decodedToken, storedDecodedToken]);
 // Router configuration to define if login or anything else
     return (
         <Master >

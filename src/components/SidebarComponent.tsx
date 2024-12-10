@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import colorPalette from "../values/colors.ts";
 import {getRoleByID, roleHasAccess, rolesGetter} from "../values/RolesGetter.tsx";
 import React, {useState} from "react";
-import {url} from "../values/BackendValues.tsx";
+import {useAuth} from "../auth/AuthContext.tsx";
 
 interface SidebarProps {
     firstName: string;
@@ -13,17 +13,14 @@ interface SidebarProps {
 const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState<number>(rolesGetter[0].id);
+    const {setIsAuthenticated} = useAuth()
 
     const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedRole(Number(event.target.value));
     };
 
     const logout = async () => {
-        await fetch(url+"/auth/logout", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include'
-        })
+        setIsAuthenticated(false)
         navigate('/login')
     }
 
