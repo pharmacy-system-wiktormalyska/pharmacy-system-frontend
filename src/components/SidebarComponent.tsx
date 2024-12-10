@@ -6,11 +6,10 @@ import React, {useState} from "react";
 import Cookies from "universal-cookie";
 
 interface SidebarProps {
-    firstName: string;
-    secondName: string;
+    userName: string | undefined
 }
 
-const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
+const SidebarComponent: React.FC<SidebarProps> = ({userName}) => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState<number>(rolesGetter[0].id);
     const cookies = new Cookies(null, {path: '/'})
@@ -41,8 +40,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
             </RoleSelector>
 
             <AccountSection>
-                <AccountName>{firstName}</AccountName>
-                <AccountName>{secondName}</AccountName>
+                <AccountName>{userName}</AccountName>
                 <LogoutButton onClick={() => logout()}>Logout</LogoutButton>
             </AccountSection>
 

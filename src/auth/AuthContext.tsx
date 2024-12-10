@@ -1,10 +1,14 @@
 import React, {createContext, ReactNode, useContext, useState} from "react";
 
+export interface DecodedTokenType {
+    sub? : string
+}
+
 interface AuthContextType {
     token: string | null
     setToken: (token: string | null) => void
-    storedDecodedToken : string | null
-    setStoredDecodedToken : (decodedToken : string | null) => void
+    storedDecodedToken : object | null
+    setStoredDecodedToken : (decodedToken : object | null) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -15,7 +19,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [token, setToken] = useState<string | null>(null)
-    const [storedDecodedToken, setStoredDecodedToken] = useState<string | null>(null)
+    const [storedDecodedToken, setStoredDecodedToken] = useState<DecodedTokenType | null>(null)
 
     return (
         <AuthContext.Provider value={{token, setToken, storedDecodedToken, setStoredDecodedToken}}>
