@@ -10,17 +10,20 @@ import {HeaderText} from "../components/HeaderText.tsx";
 import {useNavigate} from "react-router-dom";
 import {url} from "../values/BackendValues.tsx";
 import {useAuth} from "../auth/AuthContext.tsx";
+import Cookies from "universal-cookie";
 
 const AuthPage: React.FC  = () => {
     const navigate = useNavigate()
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);
-    const {setToken, setIsAuthenticated} = useAuth()
-
+    const {setToken} = useAuth()
+    const cookies = new Cookies(null, {path: '/'})
 
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault()
+
+
 
         const response = await fetch(url+"/auth/login", {
             method: 'POST',
@@ -34,7 +37,10 @@ const AuthPage: React.FC  = () => {
 
         const data = await response.json();
         setToken(data.token)
-        setIsAuthenticated(true)
+
+        const expirationDate = new Date()
+        expirationDate.setHours(expirationDate.getHours() + 8)
+        cookies.set('token', data.token, { expires: expirationDate})
 
         if (response.ok) {
             setRedirect(true);

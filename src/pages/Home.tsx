@@ -11,21 +11,28 @@ import {useEffect, useState} from "react";
 import PrescriptionPanel from "./dashboards/PrescriptionPanel.tsx";
 import {useAuth} from "../auth/AuthContext.tsx";
 import {useJwt} from "react-jwt";
+import Cookies from "universal-cookie";
 export const MainPage = () => {
     const [name] = useState('');
     const [surName] = useState('');
-    const {setStoredDecodedToken, isAuthenticated, token, storedDecodedToken} = useAuth()
+    const {setStoredDecodedToken, token, storedDecodedToken} = useAuth()
     const {decodedToken} = useJwt(token as string)
     const navigate = useNavigate()
 
 
     useEffect(() => {
-        if (!isAuthenticated) {
+        const cookies = new Cookies(null, {path: '/'})
+        if (cookies.get('token') == undefined) {
+            console.log('dupa')
+        }
+
+        if (cookies.get('token') == undefined) {
             navigate("/login")
+            return
         }
         setStoredDecodedToken(decodedToken as string)
-        console.log(storedDecodedToken)
-    }, [navigate, isAuthenticated, setStoredDecodedToken, decodedToken, storedDecodedToken]);
+        // console.log(storedDecodedToken)
+    }, [navigate, setStoredDecodedToken, decodedToken, storedDecodedToken]);
 // Router configuration to define if login or anything else
     return (
         <Master >
