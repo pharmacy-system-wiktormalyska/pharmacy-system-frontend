@@ -9,34 +9,37 @@ import SidebarComponent from "../components/SidebarComponent.tsx";
 import {Routes, Route, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PrescriptionPanel from "./dashboards/PrescriptionPanel.tsx";
-import {useAuth} from "../auth/AuthContext.tsx";
+import {DecodedTokenType, useAuth} from "../auth/AuthContext.tsx";
 import {useJwt} from "react-jwt";
 import Cookies from "universal-cookie";
 export const MainPage = () => {
-    const [name] = useState('');
-    const [surName] = useState('');
-    const {setStoredDecodedToken, token, storedDecodedToken} = useAuth()
-    const {decodedToken} = useJwt(token as string)
+    const [username, setUsername] = useState<string | undefined>(undefined);
+    const {setStoredDecodedToken, token, storedDecodedToken, setToken} = useAuth()
+    const {decodedToken} = useJwt<DecodedTokenType>(token as string)
     const navigate = useNavigate()
 
 
     useEffect(() => {
         const cookies = new Cookies(null, {path: '/'})
-        if (cookies.get('token') == undefined) {
-            console.log('dupa')
-        }
+        const tokenFromCookies = cookies.get('token');
 
-        if (cookies.get('token') == undefined) {
+        if (tokenFromCookies == undefined) {
             navigate("/login")
             return
         }
-        setStoredDecodedToken(decodedToken as string)
-        // console.log(storedDecodedToken)
-    }, [navigate, setStoredDecodedToken, decodedToken, storedDecodedToken]);
+        setToken(tokenFromCookies)
+
+        if (decodedToken) {
+            setStoredDecodedToken(decodedToken)
+            setUsername(decodedToken.sub)
+        }
+    }, [navigate, setStoredDecodedToken, decodedToken, storedDecodedToken, setToken]);
+
+
 // Router configuration to define if login or anything else
     return (
         <Master >
-            <SidebarComponent firstName={name} secondName={surName}/>
+            <SidebarComponent userName={username}/>
             <SwappableComponent>
                     <Routes>
                         <Route path="*" element={<OwnerPanel/>}/>
