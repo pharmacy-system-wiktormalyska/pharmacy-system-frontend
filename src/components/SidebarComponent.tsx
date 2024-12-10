@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import colorPalette from "../values/colors.ts";
 import {getRoleByID, roleHasAccess, rolesGetter} from "../values/RolesGetter.tsx";
 import React, {useState} from "react";
-import {useAuth} from "../auth/AuthContext.tsx";
+import Cookies from "universal-cookie";
 
 interface SidebarProps {
     firstName: string;
@@ -13,14 +13,14 @@ interface SidebarProps {
 const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState<number>(rolesGetter[0].id);
-    const {setIsAuthenticated} = useAuth()
+    const cookies = new Cookies(null, {path: '/'})
 
     const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedRole(Number(event.target.value));
     };
 
     const logout = async () => {
-        setIsAuthenticated(false)
+        cookies.remove("token", {path: "/"})
         navigate('/login')
     }
 

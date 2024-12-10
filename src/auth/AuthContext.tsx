@@ -1,10 +1,8 @@
-import {createContext, ReactNode, useContext, useEffect, useState} from "react";
+import React, {createContext, ReactNode, useContext, useState} from "react";
 
 interface AuthContextType {
     token: string | null
     setToken: (token: string | null) => void
-    isAuthenticated: boolean | false
-    setIsAuthenticated : (isAuthenticated : boolean | false) => void
     storedDecodedToken : string | null
     setStoredDecodedToken : (decodedToken : string | null) => void
 }
@@ -17,25 +15,16 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [token, setToken] = useState<string | null>(null)
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | false>(false)
     const [storedDecodedToken, setStoredDecodedToken] = useState<string | null>(null)
 
-    useEffect(() => {
-        const savedToken = localStorage.getItem("token")
-
-        if (savedToken) {
-            setToken(savedToken)
-            setIsAuthenticated(true)
-        }
-    }, []);
-
     return (
-        <AuthContext.Provider value={{token, setToken, isAuthenticated, setIsAuthenticated, storedDecodedToken, setStoredDecodedToken}}>
+        <AuthContext.Provider value={{token, setToken, storedDecodedToken, setStoredDecodedToken}}>
             {children}
         </AuthContext.Provider>
     )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext)
     if (context === undefined) {
