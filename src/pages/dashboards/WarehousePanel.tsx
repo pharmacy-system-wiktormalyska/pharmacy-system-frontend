@@ -209,7 +209,7 @@ const StyledTable = styled.table`
 `;
 
 
-const TabButton = styled.button<{ active: boolean }>`
+const TabButton = styled.button<{ active?: boolean | false}>`
     background-color: ${(props) => (props.active ? '#00296b' : '#495057')};
     color: ${(props) => (props.active ? '#f1f2f6' : '#f1f2f6')};
     border: none;

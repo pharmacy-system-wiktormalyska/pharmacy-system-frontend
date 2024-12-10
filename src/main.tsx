@@ -5,6 +5,7 @@ import {MainPage} from "./pages/Home.tsx"
 import AuthPage from "./pages/Auth.tsx"
 import {StrictMode} from "react";
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import {AuthProvider} from "./auth/AuthContext.tsx";
 // Router configuration to define if login or anything else
 const router = createBrowserRouter([
     {
@@ -19,6 +20,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <Router router={router} />
+        <AuthProvider>
+            <Router router={router} />
+        </AuthProvider>
     </StrictMode>
 )

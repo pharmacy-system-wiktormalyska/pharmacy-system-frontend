@@ -3,18 +3,21 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
 import '../App.css'
-import {SyntheticEvent, useState} from "react";
+import {SyntheticEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 import {HeaderText} from "../components/HeaderText.tsx";
 import {useNavigate} from "react-router-dom";
 import {url} from "../values/BackendValues.tsx";
+import {useAuth} from "../auth/AuthContext.tsx";
 
 const AuthPage: React.FC  = () => {
     const navigate = useNavigate()
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);
+    const {setToken, setIsAuthenticated} = useAuth()
+
 
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault()
@@ -30,8 +33,8 @@ const AuthPage: React.FC  = () => {
         })
 
         const data = await response.json();
-        console.log('Response:', response);
-        console.log('Data:', data);
+        setToken(data.token)
+        setIsAuthenticated(true)
 
         if (response.ok) {
             setRedirect(true);
@@ -39,10 +42,11 @@ const AuthPage: React.FC  = () => {
             console.error('Login failed:', data);
         }
     }
-    if (redirect) {
-        navigate('/')
-    }
-
+    useEffect(() => {
+        if (redirect) {
+            navigate('/')
+        }
+    }, [redirect, navigate])
     return (
         <>
             <AuthMain>
