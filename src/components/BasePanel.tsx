@@ -4,7 +4,7 @@ import colorPalette from "../values/colors.ts";
 
 interface BasePanelProps {
     title: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     panelKey?: string | number;
 }
 

@@ -1,17 +1,18 @@
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import OwnerPanel from "./dashboards/OwnerPanel.tsx";
-import WarehousePanel from "./dashboards/WarehousePanel.tsx";
-import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
+import OwnerPanel from "./panels/OwnerPanel.tsx";
+import WarehousePanel from "./panels/WarehousePanel.tsx";
+import DepartmentPanel from "./panels/DepartmentPanel.tsx";
 import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 import SidebarComponent from "../components/SidebarComponent.tsx";
 import {Routes, Route, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import PrescriptionPanel from "./dashboards/PrescriptionPanel.tsx";
+import PrescriptionPanel from "./panels/PrescriptionPanel.tsx";
 import {DecodedTokenType, useAuth} from "../auth/AuthContext.tsx";
 import {useJwt} from "react-jwt";
 import Cookies from "universal-cookie";
+import {DrugOrderPanel} from "./panels/DrugOrderPanel.tsx";
 export const MainPage = () => {
     const [username, setUsername] = useState<string | undefined>(undefined);
     const {setStoredDecodedToken, token, storedDecodedToken, setToken} = useAuth()
@@ -46,6 +47,7 @@ export const MainPage = () => {
                         <Route path="/prescription" element={<PrescriptionPanel/>}/>
                         <Route path="/warehouse" element={<WarehousePanel/>}/>
                         <Route path="/department" element={<DepartmentPanel/>}/>
+                        <Route path="/drug_order" element={<DrugOrderPanel/>}/>
                     </Routes>
             </SwappableComponent>
 
