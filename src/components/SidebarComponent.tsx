@@ -31,6 +31,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({userName}) => {
             {role && roleHasAccess(role, "prescription") && <TabButton onClick={() => navigate("/prescription")}>Prescription Panel</TabButton>}
             {role && roleHasAccess(role, "warehouse_edit") && <TabButton onClick={() => navigate("/warehouse")}>Warehouse Panel</TabButton>}
             {role && roleHasAccess(role, "department") && <TabButton onClick={() => navigate("/department")}>Department Panel</TabButton>}
+            {role && roleHasAccess(role, "drug_order") && <TabButton onClick={() => navigate("/drug_order")}>Drug Order Panel</TabButton>}
 
             {/*TODO: Mockowany wybór*/ }
             <RoleSelector value={selectedRole} onChange={handleRoleChange}>
