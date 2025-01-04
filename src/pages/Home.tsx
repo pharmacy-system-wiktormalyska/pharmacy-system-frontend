@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import OwnerPanel from "./dashboards/OwnerPanel.tsx";
 import WarehousePanel from "./dashboards/WarehousePanel.tsx";
 import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
+import StorePanel from "./dashboards/StorePanel.tsx";
 import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 import SidebarComponent from "../components/SidebarComponent.tsx";
@@ -10,6 +11,7 @@ import {Routes, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PrescriptionPanel from "./dashboards/PrescriptionPanel.tsx";
 import {url} from "../values/BackendValues.tsx";
+
 export const MainPage = () => {
     const [name, setName] = useState('');
     const [surName, setSurName] = useState('');
@@ -35,6 +37,7 @@ export const MainPage = () => {
             <SwappableComponent>
                     <Routes>
                         <Route path="*" element={<OwnerPanel/>}/>
+                        <Route path="/store" element={<StorePanel/>}/>
                         <Route path="/prescription" element={<PrescriptionPanel/>}/>
                         <Route path="/warehouse" element={<WarehousePanel/>}/>
                         <Route path="/department" element={<DepartmentPanel/>}/>
