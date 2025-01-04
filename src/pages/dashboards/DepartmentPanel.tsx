@@ -5,7 +5,7 @@ import colorPalette from "../../values/colors.ts";
 
 const DepartmentPanel = () => {
     return (
-        <BasePanel title="Department Panel" key={"department"}>
+        <BasePanel title="Department panel" key={"department"}>
             <Column width={"auto"}>
                 <Tile height={"auto"}>
                     <PrescriptionIcon className="bi bi-prescription"></PrescriptionIcon>
