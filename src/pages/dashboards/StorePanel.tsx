@@ -87,7 +87,7 @@ const StorePanel = () => {
     const totalPrice = orderItems.reduce((acc, item) => acc + item.total, 0);
 
     return (
-        <BasePanel title="Store Panel" panelKey="store">
+        <BasePanel title="Store panel" panelKey="store">
             <Container>
                 <LeftSection>
                     <TableContainer>

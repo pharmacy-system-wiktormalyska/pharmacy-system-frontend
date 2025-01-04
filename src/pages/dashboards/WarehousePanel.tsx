@@ -39,7 +39,7 @@ const WarehousePanel = () => {
     const closeDetails = () => setSelectedDetails(null);
 
     return (
-        <BasePanel title="Warehouse Panel" panelKey="warehouse">
+        <BasePanel title="Warehouse panel" panelKey="warehouse">
             <CenteredContainer>
                 <ButtonGroup>
                     <TabButton

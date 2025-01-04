@@ -39,7 +39,7 @@ const PrescriptionPanel = () => {
     };
 
     return (
-        <BasePanel title="Prescription Panel" panelKey="prescription">
+        <BasePanel title="Prescription panel" panelKey="prescription">
             <CenteredContainer>
                 <FormContainer onSubmit={handleSubmit}>
                     <FormColumn>

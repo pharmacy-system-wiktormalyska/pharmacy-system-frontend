@@ -3,7 +3,7 @@ import BasePanel from "../../components/BasePanel.tsx";
 
 const OwnerPanel = () => {
     return (
-        <BasePanel title="Owner Paanel" key={"owner"}>
+        <BasePanel title="Owner panel" key={"owner"}>
             <>
             </>
         </BasePanel>
