@@ -3,23 +3,27 @@ import {useNavigate} from "react-router-dom";
 import colorPalette from "../values/colors.ts";
 import {getRoleByID, roleHasAccess, rolesGetter} from "../values/RolesGetter.tsx";
 import React, {useState} from "react";
-import Cookies from "universal-cookie";
+import {url} from "../values/BackendValues.tsx";
 
 interface SidebarProps {
-    userName: string | undefined
+    firstName: string;
+    secondName: string;
 }
 
-const SidebarComponent: React.FC<SidebarProps> = ({userName}) => {
+const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
     const navigate = useNavigate()
     const [selectedRole, setSelectedRole] = useState<number>(rolesGetter[0].id);
-    const cookies = new Cookies(null, {path: '/'})
 
     const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedRole(Number(event.target.value));
     };
 
     const logout = async () => {
-        cookies.remove("token", {path: "/"})
+        await fetch(url+"/auth/logout", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include'
+        })
         navigate('/login')
     }
 
@@ -28,9 +32,10 @@ const SidebarComponent: React.FC<SidebarProps> = ({userName}) => {
         <Sidebar>
             <Logo />
             {role && roleHasAccess(role, "*") && <TabButton onClick={() => navigate("/")}>Owner Panel</TabButton>}
-            {role && roleHasAccess(role, "prescription") && <TabButton onClick={() => navigate("/prescription")}>Prescription Panel</TabButton>}
-            {role && roleHasAccess(role, "warehouse_edit") && <TabButton onClick={() => navigate("/warehouse")}>Warehouse Panel</TabButton>}
-            {role && roleHasAccess(role, "department") && <TabButton onClick={() => navigate("/department")}>Department Panel</TabButton>}
+            {role && roleHasAccess(role, "sell") && <TabButton onClick={() => navigate("/store")}>Store</TabButton>}
+            {role && roleHasAccess(role, "prescription") && <TabButton onClick={() => navigate("/prescription")}>Prescriptions</TabButton>}
+            {role && roleHasAccess(role, "warehouse_edit") && <TabButton onClick={() => navigate("/warehouse")}>Warehouse</TabButton>}
+            {role && roleHasAccess(role, "department") && <TabButton onClick={() => navigate("/department")}>Department</TabButton>}
             {role && roleHasAccess(role, "drug_order") && <TabButton onClick={() => navigate("/drug_order")}>Drug Order Panel</TabButton>}
 
             {/*TODO: Mockowany wybór*/ }
@@ -41,7 +46,8 @@ const SidebarComponent: React.FC<SidebarProps> = ({userName}) => {
             </RoleSelector>
 
             <AccountSection>
-                <AccountName>{userName}</AccountName>
+                <AccountName>{firstName}</AccountName>
+                <AccountName>{secondName}</AccountName>
                 <LogoutButton onClick={() => logout()}>Logout</LogoutButton>
             </AccountSection>
 

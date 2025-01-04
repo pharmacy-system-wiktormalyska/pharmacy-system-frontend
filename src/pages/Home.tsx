@@ -1,53 +1,48 @@
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import OwnerPanel from "./panels/OwnerPanel.tsx";
-import WarehousePanel from "./panels/WarehousePanel.tsx";
-import DepartmentPanel from "./panels/DepartmentPanel.tsx";
+import OwnerPanel from "./dashboards/OwnerPanel.tsx";
+import WarehousePanel from "./dashboards/WarehousePanel.tsx";
+import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
 import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 import SidebarComponent from "../components/SidebarComponent.tsx";
-import {Routes, Route, useNavigate} from "react-router-dom";
+import {Routes, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PrescriptionPanel from "./panels/PrescriptionPanel.tsx";
 import {DecodedTokenType, useAuth} from "../auth/AuthContext.tsx";
 import {useJwt} from "react-jwt";
 import Cookies from "universal-cookie";
 import {DrugOrderPanel} from "./panels/DrugOrderPanel.tsx";
+import {url} from "../values/BackendValues.tsx";
+
 export const MainPage = () => {
-    const [username, setUsername] = useState<string | undefined>(undefined);
-    const {setStoredDecodedToken, token, storedDecodedToken, setToken} = useAuth()
-    const {decodedToken} = useJwt<DecodedTokenType>(token as string)
-    const navigate = useNavigate()
-
-
+    const [name, setName] = useState('');
+    const [surName, setSurName] = useState('');
     useEffect(() => {
-        const cookies = new Cookies(null, {path: '/'})
-        const tokenFromCookies = cookies.get('token');
-
-        if (tokenFromCookies == undefined) {
-            navigate("/login")
-            return
-        }
-        setToken(tokenFromCookies)
-
-        if (decodedToken) {
-            setStoredDecodedToken(decodedToken)
-            setUsername(decodedToken.sub)
-        }
-    }, [navigate, setStoredDecodedToken, decodedToken, storedDecodedToken, setToken]);
-
+        (
+            async () => {
+                 const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'include'
+                })
+                const content = await response.json()
+                setName(content.name)
+                setSurName(content.surname)
+            }
+        )()
+    }, []);
 
 // Router configuration to define if login or anything else
     return (
         <Master >
-            <SidebarComponent userName={username}/>
+            <SidebarComponent firstName={name} secondName={surName}/>
             <SwappableComponent>
                     <Routes>
                         <Route path="*" element={<OwnerPanel/>}/>
                         <Route path="/prescription" element={<PrescriptionPanel/>}/>
                         <Route path="/warehouse" element={<WarehousePanel/>}/>
                         <Route path="/department" element={<DepartmentPanel/>}/>
-                        <Route path="/drug_order" element={<DrugOrderPanel/>}/>
                     </Routes>
             </SwappableComponent>
 

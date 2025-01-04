@@ -97,7 +97,7 @@ const WarehousePanel = () => {
     }
 
     return (
-        <BasePanel title="Warehouse Panel" panelKey="warehouse">
+        <BasePanel title="Warehouse panel" panelKey="warehouse">
             <CenteredContainer>
                 <ButtonGroup>
                     <TabButton
