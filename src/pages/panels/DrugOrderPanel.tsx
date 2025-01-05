@@ -1,29 +1,34 @@
 import BasePanel from "../../components/BasePanel.tsx";
 import styled from "styled-components";
 import colorPalette from "../../values/colors.ts";
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import { StyledTable } from "../../components/StyledTable.tsx";
 import { useAuth } from "../../auth/AuthContext.tsx";
 import {fetchBackend} from "../../connection/fetchBackend.tsx";
 import {DrugOrderResponse} from "../../values/BackendValues.tsx";
 
 export const DrugOrderPanel = () => {
-    const [option, setOption] = useState<"add" | "update" | "remove">("add");
     const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[] | null>([]);
     const { token } = useAuth();
+    const hasFetched = useRef(false);
 
-    const fetchDrugOrders = async () => {
-        const data = await fetchBackend("/drug/get/all", "POST", token);
-        setDrugOrders(data);
-    };
+
 
     useEffect(() => {
-        fetchDrugOrders();
-    }, [token]);
+        const fetchDrugOrders = async () => {
+            if (!token || hasFetched.current) return;  // Prevent multiple calls
+            hasFetched.current = true;
 
-    const changeOption = (pickedOption: "add" | "update" | "remove") => {
-        setOption(pickedOption);
-    };
+            const data = await fetchBackend("/drug/order/get/all", "GET", token);
+            setDrugOrders(data);
+        };
+
+        if (token) {
+            fetchDrugOrders();  // Call only if token is available
+        }
+    }, [token]);  // Dependency on token
+
+
 
     const tableHead = () => (
         <>
@@ -61,9 +66,10 @@ export const DrugOrderPanel = () => {
         <BasePanel title="Drug Order Panel">
             <Body>
                 <Options>
-                    <Option onClick={() => changeOption("add")}>Add</Option>
-                    <Option onClick={() => changeOption("update")}>Update</Option>
-                    <Option onClick={() => changeOption("remove")}>Remove</Option>
+                    {/*TODO: ADD POP OVER*/}
+                    <Option onClick={() => {}}>Add</Option>
+                    <Option onClick={() => {}}>Update</Option>
+                    <Option onClick={() => {}}>Remove</Option>
                 </Options>
                 <StyledTable thead={tableHead()} tbody={tableBody()} />
             </Body>
