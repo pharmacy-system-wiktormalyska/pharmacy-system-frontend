@@ -1,46 +1,37 @@
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import OwnerPanel from "./dashboards/OwnerPanel.tsx";
-import WarehousePanel from "./dashboards/WarehousePanel.tsx";
-import DepartmentPanel from "./dashboards/DepartmentPanel.tsx";
-import StorePanel from "./dashboards/StorePanel.tsx";
+import OwnerPanel from "./panels/OwnerPanel.tsx";
+import WarehousePanel from "./panels/WarehousePanel.tsx";
 import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 import SidebarComponent from "../components/SidebarComponent.tsx";
 import {Routes, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
-import PrescriptionPanel from "./dashboards/PrescriptionPanel.tsx";
-import {url} from "../values/BackendValues.tsx";
+import PrescriptionPanel from "./panels/PrescriptionPanel.tsx";
+import StorePanel from "./panels/StorePanel.tsx";
+import {DrugOrderPanel} from "./panels/DrugOrderPanel.tsx";
+import {useAuth} from "../auth/AuthContext.tsx";
 
 export const MainPage = () => {
-    const [name, setName] = useState('');
-    const [surName, setSurName] = useState('');
+    const [name, setName] = useState('')
+    const [roles, setRoles] = useState<string[]>([])
+    const {storedDecodedToken} = useAuth()
     useEffect(() => {
-        (
-            async () => {
-                 const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'include'
-                })
-                const content = await response.json()
-                setName(content.name)
-                setSurName(content.surname)
-            }
-        )()
-    }, []);
+        setName(storedDecodedToken?.name || "")
+        setRoles(storedDecodedToken?.authorities || [""])
+    }, [storedDecodedToken?.authorities, storedDecodedToken?.name]);
 
 // Router configuration to define if login or anything else
     return (
         <Master >
-            <SidebarComponent firstName={name} secondName={surName}/>
+            <SidebarComponent name={name} authorities={roles}/>
             <SwappableComponent>
                     <Routes>
                         <Route path="*" element={<OwnerPanel/>}/>
-                        <Route path="/store" element={<StorePanel/>}/>
                         <Route path="/prescription" element={<PrescriptionPanel/>}/>
                         <Route path="/warehouse" element={<WarehousePanel/>}/>
-                        <Route path="/department" element={<DepartmentPanel/>}/>
+                        <Route path="/store" element={<StorePanel/>}/>
+                        <Route path="/drug_order" element={<DrugOrderPanel/>}/>
                     </Routes>
             </SwappableComponent>
 

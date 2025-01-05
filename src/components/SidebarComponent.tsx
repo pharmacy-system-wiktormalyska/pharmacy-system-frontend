@@ -1,23 +1,22 @@
 import styled from "styled-components";
 import {useNavigate} from "react-router-dom";
 import colorPalette from "../values/colors.ts";
-import {getRoleByID, roleHasAccess, rolesGetter} from "../values/RolesGetter.tsx";
-import React, {useState} from "react";
+import {rolesGetter} from "../values/RolesGetter.tsx";
+import React from "react";
 import {url} from "../values/BackendValues.tsx";
 
 interface SidebarProps {
-    firstName: string;
-    secondName: string;
+    name: string;
+    authorities: string[];
 }
 
-const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
+const SidebarComponent: React.FC<SidebarProps> = ({name, authorities}) => {
     const navigate = useNavigate()
-    const [selectedRole, setSelectedRole] = useState<number>(rolesGetter[0].id);
-
-    const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedRole(Number(event.target.value));
-    };
-
+    // const [selectedRole, setSelectedRole] = useState<number>(0);
+    //
+    // const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //     setSelectedRole(Number(event.target.value));
+    // };
     const logout = async () => {
         await fetch(url+"/auth/logout", {
             method: 'POST',
@@ -27,26 +26,35 @@ const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
         navigate('/login')
     }
 
-    const role = getRoleByID(selectedRole);
+    const hasAccess = (authority: string): boolean => {
+        for (const role of rolesGetter) {
+            if (authorities.includes(role.name)) {
+                if (role.allowedPanels.includes(authority) || role.allowedPanels.includes("*")) {
+                    return true;
+                }
+            }
+        }
+        return false
+    }
+
     return (
         <Sidebar>
             <Logo />
-            {role && roleHasAccess(role, "*") && <TabButton onClick={() => navigate("/")}>Owner Panel</TabButton>}
-            {role && roleHasAccess(role, "sell") && <TabButton onClick={() => navigate("/store")}>Store</TabButton>}
-            {role && roleHasAccess(role, "prescription") && <TabButton onClick={() => navigate("/prescription")}>Prescriptions</TabButton>}
-            {role && roleHasAccess(role, "warehouse_edit") && <TabButton onClick={() => navigate("/warehouse")}>Warehouse</TabButton>}
-            {role && roleHasAccess(role, "department") && <TabButton onClick={() => navigate("/department")}>Department</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("/")}>Owner Panel</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("/store")}>Store</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("/prescription")}>Prescriptions</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("/warehouse")}>Warehouse</TabButton>}
+            {/*{role && roleHasAccess(role, "department") && <TabButton onClick={() => navigate("/department")}>Department</TabButton>}*/}
+            {hasAccess("*") && <TabButton onClick={() => navigate("/drug_order")}>Drug Order Panel</TabButton>}
 
-            {/*TODO: Mockowany wybór*/ }
-            <RoleSelector value={selectedRole} onChange={handleRoleChange}>
-                {rolesGetter.map(role => (
-                    <option key={role.id} value={role.id}>{role.name}</option>
-                ))}
-            </RoleSelector>
+            {/*<RoleSelector value={selectedRole} onChange={handleRoleChange}>*/}
+            {/*    {rolesGetter.map(role => (*/}
+            {/*        <option key={role.id} value={role.id}>{role.name}</option>*/}
+            {/*    ))}*/}
+            {/*</RoleSelector>*/}
 
             <AccountSection>
-                <AccountName>{firstName}</AccountName>
-                <AccountName>{secondName}</AccountName>
+                <AccountName>{name}</AccountName>
                 <LogoutButton onClick={() => logout()}>Logout</LogoutButton>
             </AccountSection>
 
@@ -55,11 +63,11 @@ const SidebarComponent: React.FC<SidebarProps> = ({firstName, secondName}) => {
 }
 
 export default SidebarComponent
-
-const RoleSelector = styled.select`
-    color: black;
-    background-color: white;
-`
+//
+// const RoleSelector = styled.select`
+//     color: black;
+//     background-color: white;
+// `
 
 export const Sidebar = styled.div`
     height: 100%;

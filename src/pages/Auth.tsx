@@ -3,21 +3,27 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 import {faLock} from '@fortawesome/free-solid-svg-icons'
 import '../App.css'
-import {SyntheticEvent, useState} from "react";
+import {SyntheticEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 import {HeaderText} from "../components/HeaderText.tsx";
 import {useNavigate} from "react-router-dom";
 import {url} from "../values/BackendValues.tsx";
+import {useAuth} from "../auth/AuthContext.tsx";
+import Cookies from "universal-cookie";
 
 const AuthPage: React.FC  = () => {
     const navigate = useNavigate()
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);
+    const {setToken} = useAuth()
+    const cookies = new Cookies(null, {path: '/'})
 
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault()
+
+
 
         const response = await fetch(url+"/auth/login", {
             method: 'POST',
@@ -30,8 +36,11 @@ const AuthPage: React.FC  = () => {
         })
 
         const data = await response.json();
-        console.log('Response:', response);
-        console.log('Data:', data);
+        setToken(data.token)
+
+        const expirationDate = new Date()
+        expirationDate.setHours(expirationDate.getHours() + 8)
+        cookies.set('token', data.token, { expires: expirationDate})
 
         if (response.ok) {
             setRedirect(true);
@@ -39,10 +48,11 @@ const AuthPage: React.FC  = () => {
             console.error('Login failed:', data);
         }
     }
-    if (redirect) {
-        navigate('/')
-    }
-
+    useEffect(() => {
+        if (redirect) {
+            navigate('/')
+        }
+    }, [redirect, navigate])
     return (
         <>
             <AuthMain>

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
 import { AiOutlineClose } from 'react-icons/ai';
+import {StyledTable} from "../../components/StyledTable.tsx";
 
 interface WarehouseItem {
     name: string;
@@ -22,7 +23,7 @@ interface RequestItem {
 }
 
 const WarehousePanel = () => {
-    const [activeTab, setActiveTab] = useState<'warehouse' | 'requestList'>('warehouse');
+    const [activeTab, setActiveTab] = useState<string | 'warehouse'>('warehouse');
     const [selectedDetails, setSelectedDetails] = useState<WarehouseItem | RequestItem | null>(null);
 
     const warehouseData: WarehouseItem[] = [
@@ -38,78 +39,82 @@ const WarehousePanel = () => {
     const openDetails = (item: WarehouseItem | RequestItem) => setSelectedDetails(item);
     const closeDetails = () => setSelectedDetails(null);
 
+    const tableHead = () => {
+        return (
+            <>
+                {activeTab === 'warehouse' && (
+                    <>
+                        <th>Name</th>
+                        <th>Number</th>
+                        <th>Expiry Date</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </>
+                )}
+                {activeTab === 'requestList' && (
+                    <>
+                        <th>Name</th>
+                        <th>Pharmacist</th>
+                        <th>Quantity</th>
+                        <th>Action</th>
+                    </>
+                )}
+            </>
+        )
+    }
+
+    const tableBody = () => {
+        return (
+            <>
+                {activeTab === 'warehouse' &&
+                    warehouseData.map((item, index) => (
+                        <tr key={index}>
+                            <td>{item.name}</td>
+                            <td>{item.number}</td>
+                            <td>{item.expiry}</td>
+                            <td>{item.price}</td>
+                            <td>
+                                <ActionButton>Order</ActionButton>
+                                <DetailsButton onClick={() => openDetails(item)}>Details</DetailsButton>
+                            </td>
+                        </tr>
+                ))}
+                {activeTab === 'requestList' &&
+                    requestListData.map((request, index) => (
+                        <tr key={index}>
+                            <td>{request.name}</td>
+                            <td>{request.pharmacist}</td>
+                            <td>{request.quantity}</td>
+                            <td>
+                                <ActionButton>Order</ActionButton>
+                                <RejectButton onClick={() => alert(`Request for ${request.name} rejected.`)}>Reject</RejectButton>
+                                <DetailsButton onClick={() => openDetails(request)}>Details</DetailsButton>
+                            </td>
+                        </tr>
+                ))}
+            </>
+        )
+    }
+
     return (
         <BasePanel title="Warehouse panel" panelKey="warehouse">
             <CenteredContainer>
                 <ButtonGroup>
                     <TabButton
-                        active={activeTab === 'warehouse'}
+                        active={(activeTab === 'warehouse').toString()}
                         onClick={() => setActiveTab('warehouse')}
                     >
                         Order by Warehouse
                     </TabButton>
                     <TabButton
-                        active={activeTab === 'requestList'}
+                        active={(activeTab === 'requestList').toString()}
                         onClick={() => setActiveTab('requestList')}
                     >
                         Order by Request List
                     </TabButton>
                 </ButtonGroup>
-
-                <StyledTableContainer>
-                    <StyledTable>
-                        <thead>
-                        <tr>
-                            {activeTab === 'warehouse' && (
-                                <>
-                                    <th>Name</th>
-                                    <th>Number</th>
-                                    <th>Expiry Date</th>
-                                    <th>Price</th>
-                                    <th>Action</th>
-                                </>
-                            )}
-                            {activeTab === 'requestList' && (
-                                <>
-                                    <th>Name</th>
-                                    <th>Pharmacist</th>
-                                    <th>Quantity</th>
-                                    <th>Action</th>
-                                </>
-                            )}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {activeTab === 'warehouse' &&
-                            warehouseData.map((item, index) => (
-                                <tr key={index}>
-                                    <td>{item.name}</td>
-                                    <td>{item.number}</td>
-                                    <td>{item.expiry}</td>
-                                    <td>{item.price}</td>
-                                    <td>
-                                        <ActionButton>Order</ActionButton>
-                                        <DetailsButton onClick={() => openDetails(item)}>Details</DetailsButton>
-                                    </td>
-                                </tr>
-                            ))}
-                        {activeTab === 'requestList' &&
-                            requestListData.map((request, index) => (
-                                <tr key={index}>
-                                    <td>{request.name}</td>
-                                    <td>{request.pharmacist}</td>
-                                    <td>{request.quantity}</td>
-                                    <td>
-                                        <ActionButton>Order</ActionButton>
-                                        <RejectButton onClick={() => alert(`Request for ${request.name} rejected.`)}>Reject</RejectButton>
-                                        <DetailsButton onClick={() => openDetails(request)}>Details</DetailsButton>
-                                    </td>
-                                </tr>
-                            ))}
-
-                        </tbody>
-                    </StyledTable>
-                </StyledTableContainer>
+                <StyledTable thead={tableHead()} tbody={tableBody()}
+            />
 
                 {selectedDetails && (
                     <PopupOverlay onClick={closeDetails}>
@@ -158,58 +163,7 @@ const ButtonGroup = styled.div`
 `;
 
 
-const StyledTableContainer = styled.div`
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    overflow-x: auto;
-`;
-
-
-const StyledTable = styled.table`
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background-color: ${colorPalette.lightBackground.hex};
-    border-radius: 10px;
-    overflow: hidden;
-
-    th, td {
-        padding: 15px;
-        text-align: center;
-        font-family: "Outfit Regular", sans-serif;
-        color: #000;
-        border-bottom: 1px solid ${colorPalette.lightBackgroundShadow.hex};
-    }
-
-    th {
-        background-color: ${colorPalette.lightBackgroundShadow.hex};
-        font-size: 16px;
-    }
-
-    tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    @media (max-width: 768px) {
-        th, td {
-            font-size: 14px;
-            padding: 10px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        th, td {
-            font-size: 12px;
-            padding: 8px;
-        }
-    }
-`;
-
-
-const TabButton = styled.button<{ active: boolean }>`
+const TabButton = styled.button<{ active?: string}>`
     background-color: ${(props) => (props.active ? '#00296b' : '#495057')};
     color: ${(props) => (props.active ? '#f1f2f6' : '#f1f2f6')};
     border: none;
