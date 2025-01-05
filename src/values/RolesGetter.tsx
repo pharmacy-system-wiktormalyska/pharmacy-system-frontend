@@ -28,10 +28,6 @@ export const rolesGetter: role[] = [
     }
 ]
 
-export const getRoleByID = (id : number):role | undefined => {
-    return rolesGetter.find(role => role.id === id);
-}
-
 export const roleHasAccess = (role: role, panelName: string): boolean => {
     return role.allowedPanels.includes(panelName) || role.allowedPanels.includes("*");
 };
