@@ -7,6 +7,8 @@ import paracetamolImage from '../../assets/images/paracetamol.jpg';
 import acodinImage from '../../assets/images/acodin.jpg';
 import vitamincImage from '../../assets/images/vitaminc.jpg';
 import estradiolImage from '../../assets/images/estradiol.jpg';
+import {fetchBackend} from "../../connection/fetchBackend.tsx";
+import {useAuth} from "../../auth/AuthContext.tsx";
 
 interface MedicineItem {
     id: number;
@@ -27,6 +29,9 @@ interface OrderItem {
 const StorePanel = () => {
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const {token} = useAuth()
+    console.log(fetchBackend("/drug/get/all", "GET", token))
+    // const medicines: MedicineItem[] =
 
     const medicines: MedicineItem[] = [
         { id: 1, name: "Ibuprofen 200mg", price: 15, stock: 50, image: ibuprofenImage },

@@ -6,12 +6,13 @@ import { StyledTable } from "../../components/StyledTable.tsx";
 import { useAuth } from "../../auth/AuthContext.tsx";
 import {fetchBackend} from "../../connection/fetchBackend.tsx";
 import {DrugOrderResponse} from "../../values/BackendValues.tsx";
+import {usePopover} from "../../components/popover/PopoverContext.tsx";
 
 export const DrugOrderPanel = () => {
     const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[] | null>([]);
     const { token } = useAuth();
     const hasFetched = useRef(false);
-
+    const {showPopover} = usePopover()
 
 
     useEffect(() => {
@@ -29,6 +30,22 @@ export const DrugOrderPanel = () => {
     }, [token]);  // Dependency on token
 
 
+    const showAddPopover = () => {
+        showPopover(
+            <>Add</>
+        )
+    }
+
+    const showUpdatePopover = () => {
+        showPopover(
+            <>Update</>
+        )
+    }
+    const showRemovePopover = () => {
+        showPopover(
+            <>Remove</>
+        )
+    }
 
     const tableHead = () => (
         <>
@@ -67,9 +84,9 @@ export const DrugOrderPanel = () => {
             <Body>
                 <Options>
                     {/*TODO: ADD POP OVER*/}
-                    <Option onClick={() => {}}>Add</Option>
-                    <Option onClick={() => {}}>Update</Option>
-                    <Option onClick={() => {}}>Remove</Option>
+                    <Option onClick={() => {showAddPopover()}}>Add</Option>
+                    <Option onClick={() => {showUpdatePopover()}}>Update</Option>
+                    <Option onClick={() => {showRemovePopover()}}>Remove</Option>
                 </Options>
                 <StyledTable thead={tableHead()} tbody={tableBody()} />
             </Body>
