@@ -7,6 +7,9 @@ import { useAuth } from "../../auth/AuthContext.tsx";
 import {fetchBackend} from "../../connection/fetchBackend.tsx";
 import {DrugOrderResponse} from "../../values/BackendValues.tsx";
 import {usePopover} from "../../components/popover/PopoverContext.tsx";
+import {AddDrugOrderPopover} from "./DrugOrderPanelComponents/AddDrugOrderPopover.tsx";
+import {UpdateDrugOrderPopover} from "./DrugOrderPanelComponents/UpdateDrugOrderPopover.tsx";
+import {RemoveDrugOrderPopover} from "./DrugOrderPanelComponents/RemoveDrugOrderPopover.tsx";
 
 export const DrugOrderPanel = () => {
     const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[] | null>([]);
@@ -31,20 +34,14 @@ export const DrugOrderPanel = () => {
 
 
     const showAddPopover = () => {
-        showPopover(
-            <>Add</>
-        )
+        showPopover(AddDrugOrderPopover())
     }
 
     const showUpdatePopover = () => {
-        showPopover(
-            <>Update</>
-        )
+        showPopover(UpdateDrugOrderPopover())
     }
     const showRemovePopover = () => {
-        showPopover(
-            <>Remove</>
-        )
+        showPopover(RemoveDrugOrderPopover())
     }
 
     const tableHead = () => (
