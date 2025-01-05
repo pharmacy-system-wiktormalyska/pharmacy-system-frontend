@@ -27,14 +27,13 @@ export const MainPage = () => {
             <SidebarComponent name={name} authorities={roles}/>
             <SwappableComponent>
                     <Routes>
-                        <Route path="/" element={<OwnerPanel/>}/>
+                        <Route path="/owner" element={<OwnerPanel/>}/>
                         <Route path="/prescription" element={<PrescriptionPanel/>}/>
                         <Route path="/warehouse" element={<WarehousePanel/>}/>
                         <Route path="/store" element={<StorePanel/>}/>
                         <Route path="/drug_order" element={<DrugOrderPanel/>}/>
                     </Routes>
             </SwappableComponent>
-
         </Master>
     );
 };

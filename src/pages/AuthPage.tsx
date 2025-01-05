@@ -48,7 +48,7 @@ const AuthPage: React.FC  = () => {
     }
     useEffect(() => {
         if (redirect) {
-            navigate('/')
+            navigate('/dashboard')
         }
     }, [redirect, navigate])
     return (

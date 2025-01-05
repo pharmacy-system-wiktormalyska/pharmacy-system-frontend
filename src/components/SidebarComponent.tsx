@@ -35,12 +35,12 @@ const SidebarComponent: React.FC<SidebarProps> = ({name, authorities}) => {
     return (
         <Sidebar>
             <Logo />
-            {hasAccess("*") && <TabButton onClick={() => navigate("/")}>Owner Panel</TabButton>}
-            {hasAccess("*") && <TabButton onClick={() => navigate("/store")}>Store</TabButton>}
-            {hasAccess("*") && <TabButton onClick={() => navigate("/prescription")}>Prescriptions</TabButton>}
-            {hasAccess("*") && <TabButton onClick={() => navigate("/warehouse")}>Warehouse</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("owner")}>Owner Panel</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("store")}>Store</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("prescription")}>Prescriptions</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("warehouse")}>Warehouse</TabButton>}
             {/*{role && roleHasAccess(role, "department") && <TabButton onClick={() => navigate("/department")}>Department</TabButton>}*/}
-            {hasAccess("*") && <TabButton onClick={() => navigate("/drug_order")}>Drug Order Panel</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("drug_order")}>Drug Order Panel</TabButton>}
 
             {/*<RoleSelector value={selectedRole} onChange={handleRoleChange}>*/}
             {/*    {rolesGetter.map(role => (*/}
