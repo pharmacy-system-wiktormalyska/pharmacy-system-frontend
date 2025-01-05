@@ -1,22 +1,23 @@
 import React, { createContext, ReactNode, useContext, useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
-import {createBrowserRouter} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
-import AuthPage from "../pages/Auth.tsx"; // Ensure this is correctly imported
 
 export interface DecodedTokenType {
-    sub?: string
-    name: string
-    iat: number
-    exp: number
-    authorities: string[]
+    sub?: string;
+    name: string;
+    iat: number;
+    exp: number;
+    authorities: string[];
 }
 
 interface AuthContextType {
+    isAuthenticated: boolean;
     token: string | null;
     setToken: (token: string | null) => void;
     storedDecodedToken: DecodedTokenType | null;
     setDecodedToken: React.Dispatch<React.SetStateAction<DecodedTokenType | null>>;
+    login: (newToken:string) => void;
+    logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,17 +26,32 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children}) => {
     const [token, setToken] = useState<string | null>(null);
     const [storedDecodedToken, setDecodedToken] = useState<DecodedTokenType | null>(null);
-    const [cookies] = useCookies(["token"]);
+    const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const router = createBrowserRouter([
-        {
-            path: '/login',
-            element: <AuthPage />,
+    const login = (newToken: string) => {
+        console.log(newToken)
+        setCookie("token", newToken, { path: "/" });
+        setToken(newToken);
+        try {
+            const decodedToken = jwtDecode<DecodedTokenType>(newToken);
+            setDecodedToken(decodedToken);
+            setIsAuthenticated(true);
+        } catch (error) {
+            console.error("Invalid token during login:", error);
+            logout();
         }
-    ])
+    };
+
+    const logout = () => {
+        removeCookie("token", { path: "/" });
+        setToken(null);
+        setDecodedToken(null);
+        setIsAuthenticated(false);
+    };
 
     useEffect(() => {
         if (cookies.token) {
@@ -44,21 +60,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 try {
                     const decodedToken = jwtDecode<DecodedTokenType>(cookies.token);
                     setDecodedToken(decodedToken);
+                    setIsAuthenticated(true);
                 } catch (error) {
-                    console.error("Invalid token:", error);
-                    setToken(null);
-                    setDecodedToken(null);
-                    router.navigate("/login")
+                    console.error("Invalid token detected in cookies:", error);
+                    logout();
                 }
             }
         } else {
-            console.log("No user data found!");
-            router.navigate("/login")
+            console.log("No token found in cookies, redirecting to login.");
+            logout();
         }
-    }, [router, cookies.token, token]);
+    }, [cookies.token, logout, token]);
 
     return (
-        <AuthContext.Provider value={{ token, setToken, storedDecodedToken, setDecodedToken }}>
+        <AuthContext.Provider
+            value={{
+                isAuthenticated,
+                token,
+                setToken,
+                storedDecodedToken,
+                setDecodedToken,
+                login,
+                logout,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
@@ -66,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
-    if (context === undefined) {
+    if (!context) {
         throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;
