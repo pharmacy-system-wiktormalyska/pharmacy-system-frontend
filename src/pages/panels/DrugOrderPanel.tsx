@@ -24,7 +24,8 @@ export const DrugOrderPanel = () => {
             hasFetched.current = true;
 
             const data = await fetchBackend("/drug/order/get/all", "GET", token);
-            setDrugOrders(data);
+            const sortedData = data.sort((a: DrugOrderResponse, b: DrugOrderResponse) => b.id - a.id);
+            setDrugOrders(sortedData);
         };
 
         if (token) {
