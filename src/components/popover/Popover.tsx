@@ -42,7 +42,6 @@ const Content =styled.div`
 `
 
 const PopoverContentWrapper = styled.div`
-    width: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -69,4 +68,5 @@ const PopoverWrapper = styled.div`
     align-content: center;
     justify-content: center;
     align-items: center;
+    overflow: visible;
 `

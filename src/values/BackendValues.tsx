@@ -47,3 +47,19 @@ export interface ManagerResponse {
     education: string;
     pharmacyIds: number[];
 }
+
+export interface PharmacistResponse {
+    id: number;
+    name: string;
+    surname: string;
+    familyName: string;
+    placeOfBirth: string;
+    dateOfBirth: Date;
+    nationality: string;
+    address: string;
+    correspondenceAddress: string;
+    fathersName: string;
+    mothersName: string;
+    education: string;
+    pharmacyId: number;
+}

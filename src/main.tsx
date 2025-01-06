@@ -6,6 +6,7 @@ import {BrowserRouter as Router} from "react-router-dom";
 import AuthRouter from "./routers/AuthRouter.tsx";
 import {Popover} from "./components/popover/Popover.tsx";
 import {PopoverProvider} from "./components/popover/PopoverContext.tsx";
+import 'react-datepicker/dist/react-datepicker.css';
 
 // Router configuration to define if login or anything else
 

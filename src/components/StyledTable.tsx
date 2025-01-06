@@ -33,7 +33,7 @@ const StyledTableContainer = styled.div`
     margin: 0 auto;
     display: flex;
     justify-content: center;
-    overflow-x: auto;
+    overflow: visible;
 `;
 
 const StyledTableComponent = styled.table`
@@ -42,7 +42,7 @@ const StyledTableComponent = styled.table`
     border-spacing: 0;
     background-color: ${colorPalette.lightBackground.hex};
     border-radius: 10px;
-    overflow: hidden;
+    overflow: visible;
 
     th, td {
         padding: 15px;
