@@ -4,6 +4,9 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { AuthProvider } from "./auth/AuthContext.tsx";
 import {BrowserRouter as Router} from "react-router-dom";
 import AuthRouter from "./routers/AuthRouter.tsx";
+import {Popover} from "./components/popover/Popover.tsx";
+import {PopoverProvider} from "./components/popover/PopoverContext.tsx";
+import 'react-datepicker/dist/react-datepicker.css';
 
 // Router configuration to define if login or anything else
 
@@ -12,7 +15,10 @@ import AuthRouter from "./routers/AuthRouter.tsx";
 createRoot(document.getElementById('root')!).render(
     <AuthProvider>
         <Router>
-            <AuthRouter />
+            <PopoverProvider>
+                <Popover />
+                <AuthRouter />
+            </PopoverProvider>
         </Router>
     </AuthProvider>
 );

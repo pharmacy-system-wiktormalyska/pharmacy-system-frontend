@@ -125,15 +125,15 @@ const WarehousePanel = () => {
                                 </CloseButton>
                             </PopupHeader>
                             <PopupContent>
-                                <h3>{selectedDetails.name}</h3>
-                                <p>
-                                    <strong>Stock</strong>
+                                <CustomH3>{selectedDetails.name}</CustomH3>
+                                <CustomP>
+                                    <CustomStrong>Stock</CustomStrong>
                                     {selectedDetails.stock}
-                                </p>
-                                <p>
-                                    <strong>Description</strong>
+                                </CustomP>
+                                <CustomP>
+                                    <CustomStrong>Description</CustomStrong>
                                     {selectedDetails.description}
-                                </p>
+                                </CustomP>
                             </PopupContent>
                         </PopupContainer>
                     </PopupOverlay>
@@ -145,6 +145,15 @@ const WarehousePanel = () => {
 
 export default WarehousePanel;
 
+const CustomH3 = styled.h3`
+    color: ${colorPalette.darkText.hex};
+`
+const CustomP = styled.p`
+    color: ${colorPalette.darkText.hex};
+`
+const CustomStrong = styled.strong`
+    color: ${colorPalette.darkText.hex};
+`
 
 const CenteredContainer = styled.div`
     display: flex;

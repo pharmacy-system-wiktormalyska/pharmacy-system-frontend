@@ -6,7 +6,7 @@ import {MainPage} from '../pages/Home.tsx';
 import OwnerPanel from "../pages/panels/OwnerPanel.tsx";
 import PrescriptionPanel from "../pages/panels/PrescriptionPanel.tsx";
 import WarehousePanel from "../pages/panels/WarehousePanel.tsx";
-import StorePanel from "../pages/panels/StorePanel.tsx";
+import {StorePanel} from "../pages/panels/StorePanel.tsx";
 import {DrugOrderPanel} from "../pages/panels/DrugOrderPanel.tsx";
 
 const AuthRouter: React.FC = () => {
