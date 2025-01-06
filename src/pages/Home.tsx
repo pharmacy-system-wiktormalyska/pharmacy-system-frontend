@@ -8,7 +8,7 @@ import SidebarComponent from "../components/SidebarComponent.tsx";
 import {Routes, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PrescriptionPanel from "./panels/PrescriptionPanel.tsx";
-import StorePanel from "./panels/StorePanel.tsx";
+import {StorePanel} from "./panels/StorePanel.tsx";
 import {DrugOrderPanel} from "./panels/DrugOrderPanel.tsx";
 import {useAuth} from "../auth/AuthContext.tsx";
 

@@ -33,8 +33,8 @@ export const DrugOrderPanel = () => {
     }, [token]);  // Dependency on token
 
 
-    const showAddPopover = () => {
-        showPopover(AddDrugOrderPopover())
+    const showAddPopover = (token:string | null) => {
+        showPopover(<AddDrugOrderPopover token={token}/>)
     }
 
     const showUpdatePopover = () => {
@@ -81,7 +81,7 @@ export const DrugOrderPanel = () => {
             <Body>
                 <Options>
                     {/*TODO: ADD POP OVER*/}
-                    <Option onClick={() => {showAddPopover()}}>Add</Option>
+                    <Option onClick={() => {showAddPopover(token)}}>Add</Option>
                     <Option onClick={() => {showUpdatePopover()}}>Update</Option>
                     <Option onClick={() => {showRemovePopover()}}>Remove</Option>
                 </Options>

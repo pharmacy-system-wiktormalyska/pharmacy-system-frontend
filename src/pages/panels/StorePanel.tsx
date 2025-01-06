@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import styled from "styled-components";
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
@@ -9,6 +9,7 @@ import vitamincImage from '../../assets/images/vitaminc.jpg';
 import estradiolImage from '../../assets/images/estradiol.jpg';
 import {fetchBackend} from "../../connection/fetchBackend.tsx";
 import {useAuth} from "../../auth/AuthContext.tsx";
+import {DrugResponse} from "../../values/BackendValues.tsx";
 
 interface MedicineItem {
     id: number;
@@ -26,13 +27,30 @@ interface OrderItem {
     total: number;
 }
 
-const StorePanel = () => {
+export const StorePanel = () => {
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
+    //TODO: add connection to backends interface
+    const [drugs, setDrugs] =  useState<DrugResponse[]>([])
     const {token} = useAuth()
-    console.log(fetchBackend("/drug/get/all", "GET", token))
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetchBackend("/drug/get/all", "GET", token);
+                if (response) {
+                    setDrugs(response);
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, [token]);
+
     // const medicines: MedicineItem[] =
 
+    /*TODO:Dodać fetch dla backend */
     const medicines: MedicineItem[] = [
         { id: 1, name: "Ibuprofen 200mg", price: 15, stock: 50, image: ibuprofenImage },
         { id: 2, name: "Paracetamol 500mg", price: 10, stock: 30, image: paracetamolImage },
@@ -144,6 +162,12 @@ const StorePanel = () => {
                                     <MedicineDetails>
                                         <MedicineName>{medicine.name}</MedicineName>
                                     </MedicineDetails>
+                                    {/*TODO: Poprawić styl
+                                        Usunąć te które są w koszyku
+                                        Jeżeli za mało to order to warehouse
+                                        wtedy dodaj od razu drug order z iloscia 1 (manager ustawia potem sobie ilosc)
+                                    */}
+                                    {medicine.stock}
                                     <ActionButtons>
                                         <AddButton onClick={() => addToOrder(medicine)}>Add to order</AddButton>
                                     </ActionButtons>
@@ -458,5 +482,3 @@ const CancelButton = styled.button`
         background-color: #d32f2f;
     }
 `;
-
-export default StorePanel;
