@@ -3,7 +3,6 @@ import styled from "styled-components";
 import colorPalette from "../../values/colors.ts";
 import {useEffect, useState} from "react";
 import {StyledTable} from "../../components/StyledTable.tsx";
-import {useAuth} from "../../auth/AuthContext.tsx";
 import {DrugOrderResponse} from "../../values/BackendValues.tsx";
 import {usePopover} from "../../components/popover/PopoverContext.tsx";
 import {AddDrugOrderPopover} from "./DrugOrderPanelComponents/AddDrugOrderPopover.tsx";
@@ -14,7 +13,6 @@ import {useGetAllDrugOrders} from "../../connection/hooks/useDrugsOrders.tsx";
 
 export const DrugOrderPanel = () => {
     const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[] | null>([]);
-    const { token } = useAuth();
     const {showPopover} = usePopover()
 
     const [selectedRow, setSelectedRow] = useState<DrugOrderResponse | null>(null)
@@ -26,14 +24,14 @@ export const DrugOrderPanel = () => {
     }, [allDrugOrders]);
 
 
-    const showAddPopover = (token:string | null) => {
-        showPopover(<AddDrugOrderPopover token={token}/>)
+    const showAddPopover = () => {
+        showPopover(<AddDrugOrderPopover/>)
         setSelectedRow(null)
     }
 
     const showUpdatePopover = () => {
         if (selectedRow !== null) {
-            showPopover(<UpdateDrugOrderPopover token={token} drugOrderResponse={selectedRow}/>)
+            showPopover(<UpdateDrugOrderPopover drugOrderResponse={selectedRow}/>)
             setSelectedRow(null)
         }
     }
@@ -98,7 +96,7 @@ export const DrugOrderPanel = () => {
         <BasePanel title="Drug Order Panel">
             <Body>
                 <Options>
-                    <Option onClick={() => {showAddPopover(token)}}>Add</Option>
+                    <Option onClick={() => {showAddPopover()}}>Add</Option>
                     <Option onClick={() => {showUpdatePopover()}}>Update</Option>
                     <Option onClick={() => {showRemovePopover()}}>Remove</Option>
                     <Option onClick={() => {setSelectedRow(null)}}>Remove Selection</Option>
