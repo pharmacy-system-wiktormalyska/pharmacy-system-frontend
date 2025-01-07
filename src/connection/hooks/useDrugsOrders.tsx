@@ -1,5 +1,5 @@
-import {APIEndpoints} from "./Endpoints.tsx";
-import {useFetchFromBackend} from "./fetchBackend.tsx";
+import {APIEndpoints} from "../Endpoints.tsx";
+import {useFetchFromBackend} from "../fetchBackend.tsx";
 
 //TODO: Zrobić tak dla reszty
 

@@ -11,7 +11,6 @@ import {useNavigate} from "react-router-dom";
 import {url} from "../values/BackendValues.tsx";
 import {useAuth} from "../auth/AuthContext.tsx";
 import Cookies from "universal-cookie";
-
 const AuthPage: React.FC  = () => {
     const navigate = useNavigate()
     const [username, setUsername] = useState('');
@@ -23,7 +22,7 @@ const AuthPage: React.FC  = () => {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault()
 
-        const response = await fetch(url+"/auth/login", {
+        const response = await fetch(url+"auth/login", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',

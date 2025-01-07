@@ -1,13 +1,14 @@
 import styled from "styled-components";
 import {Button, Dropdown} from "react-bootstrap";
-import {fetchBackend} from "../../../connection/fetchBackend.tsx";
 import {useEffect, useState} from "react";
 import {DrugOrderResponse, DrugResponse, ManagerResponse, OrderStatus} from "../../../values/BackendValues.tsx";
 import NumberInputWithArrows from "../../../components/NumberInputWithArrows.tsx";
 import {StyledTable} from "../../../components/StyledTable.tsx";
 import colorPalette from "../../../values/colors.ts";
+import {useGetAllDrugs} from "../../../connection/hooks/useDrug.tsx";
+import {useGetAllManagers} from "../../../connection/hooks/useManagers.tsx";
 
-export const AddDrugOrderPopover = ({token}: {token: string | null}) => {
+export const AddDrugOrderPopover = () => {
     const [drugs, setDrugs] =  useState<DrugResponse[]>([])
     const [selectedDrug, setSelectedDrug] = useState<DrugResponse>()
     const [selectedDrugCommonName, setSelectedDrugCommonName] = useState<string>("Select Drug")
@@ -18,54 +19,14 @@ export const AddDrugOrderPopover = ({token}: {token: string | null}) => {
 
     const [amount, setAmount] = useState(1);
 
+    const [isLoading, setIsLoading] = useState(true)
+    const {data: fetchedDrugs} = useGetAllDrugs()
+    const {data: fetchedManagers} = useGetAllManagers()
     useEffect(() => {
-        const fetchDrugs = async () => {
-            try {
-                const response = await fetchBackend("/drug/get/all", "GET", token);
-                if (response) {
-                    setDrugs(response);
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchDrugs().then(() => console.log("Fetched Drug Data"));
-
-        const fetchManagers = async () => {
-            const managersFetched:ManagerResponse[] = [
-                {
-                    id: 1,
-                    name: "John",
-                    surname: "Doe",
-                    familyName: "Doe",
-                    placeOfBirth: "City, Country",
-                    dateOfBirth: "1980-01-01",
-                    nationality: "Country",
-                    address: "123 Main St, City, Country",
-                    correspondenceAddress: "456 Correspondence Rd, City, Country",
-                    fathersName: "Robert Doe",
-                    mothersName: "Jane Doe",
-                    education: "Bachelor's Degree in Pharmacy",
-                    pharmacyIds: [101, 102, 103]
-                }
-            ]
-            setManagers(managersFetched)
-
-            /*TODO: Podłącz do bazy */
-
-            // try {
-            //     const response = await fetchBackend("/manager/get/all", "GET", token);
-            //     if (response) {
-            //         setManagers(response);
-            //     }
-            // } catch (error) {
-            //     console.error("Error fetching data:", error);
-            // }
-        };
-
-        fetchManagers().then(() => console.log("Fetched Manager Data"));
-    }, [token]);
+        setDrugs(fetchedDrugs)
+        setManagers(fetchedManagers)
+        setIsLoading(false)
+    }, [fetchedDrugs, fetchedManagers]);
 
     const pickDrug = (drug : DrugResponse) => {
         setSelectedDrug(drug)
@@ -111,6 +72,11 @@ export const AddDrugOrderPopover = ({token}: {token: string | null}) => {
         const handleAmountChange = (newAmount: number) => {
             setAmount(newAmount);
         };
+        if (isLoading) return (<>Loading...</>)
+
+        const safeDrugs = drugs || [];
+        const safeManagers = managers || [];
+
         return (
             <>
                 <tr>
@@ -121,7 +87,7 @@ export const AddDrugOrderPopover = ({token}: {token: string | null}) => {
                             </DropdownPick>
 
                             <Dropdown.Menu>
-                                {drugs.map((drug: DrugResponse) => (
+                                {safeDrugs.map((drug: DrugResponse) => (
                                     <Dropdown.Item key={drug.id} onClick={() => pickDrug(drug)}>
                                         {drug.commonName}
                                     </Dropdown.Item>
@@ -139,7 +105,7 @@ export const AddDrugOrderPopover = ({token}: {token: string | null}) => {
                             </DropdownPick>
 
                             <Dropdown.Menu>
-                                {managers.map((manager: ManagerResponse) => (
+                                {safeManagers.map((manager: ManagerResponse) => (
                                     <Dropdown.Item key={manager.id} onClick={() => pickManager(manager)}>
                                         {manager.name + " " + manager.familyName}
                                     </Dropdown.Item>
