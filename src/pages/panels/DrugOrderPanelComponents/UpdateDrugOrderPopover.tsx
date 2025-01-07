@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import {Button, Dropdown, Form} from "react-bootstrap";
-import {fetchBackend} from "../../../connection/fetchBackend.tsx";
+import {fetchBackend, getDrugOrders} from "../../../connection/fetchBackend.tsx";
 import {useEffect, useState} from "react";
 import {
     DrugOrderResponse,
@@ -35,18 +35,7 @@ export const UpdateDrugOrderPopover = ({token, drugOrderResponse}: {token: strin
 
     useEffect(() => {
         console.log(drugOrderResponse)
-        const fetchDrugs = async () => {
-            try {
-                const response = await fetchBackend("/drug/get/all", "GET", token);
-                if (response) {
-                    setDrugs(response);
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchDrugs().then(() => console.log("Fetched Drug Data"));
+        const {data} = use
 
 
         const fetchManagers = async () => {

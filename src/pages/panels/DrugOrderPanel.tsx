@@ -26,6 +26,7 @@ export const DrugOrderPanel = () => {
             hasFetched.current = true;
             //TODO: Zamienić ID na Nazwy
             let data:DrugOrderResponse[] = await fetchBackend("/drug/order/get/all", "GET", token);
+            console.log(data)
             data = [{
                 id: 0,
                 drugId: 1,
