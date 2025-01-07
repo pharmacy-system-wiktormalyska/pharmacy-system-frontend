@@ -1,47 +1,40 @@
-import { url } from "../values/BackendValues.tsx";
+import {url} from "../values/BackendValues.tsx";
+import {useQuery} from "@tanstack/react-query";
+import {useAuth} from "../auth/AuthContext.tsx";
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+export enum HttpRequestMethods{
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    DELETE = 'DELETE',
+    PATCH = 'PATCH',
+    HEAD = 'HEAD',
+    OPTIONS = 'OPTIONS',
+    TRACE = 'TRACE',
+    CONNECT = 'CONNECT',
+}
 
-export const fetchBackend = async (endpoint: string, method: string = "GET", token?: string | null) => {
-    const maxAttempts = 10;
-    let attempts = 0;
-    while (attempts < maxAttempts) {
-        try {
-            const response = await fetch(url + endpoint, {
-                method: method,
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-                credentials: "include",
-            });
+export const useFetchFromBackend = (key: string, endpoint: string, method: HttpRequestMethods) => {
+    const { token } = useAuth();
 
-            if (!response.ok) {
-                console.error(`Failed to fetch request. Status: ${response.status}`);
-                return;
-            }
+    return useQuery({
+        queryKey: [key, endpoint, method],
+        queryFn: () => fetchData(endpoint, method, token || ""),
+        retry: true,
+    });
+};
 
-            const text = await response.text();
-            if (!text) {
-                console.warn("Server returned no content");
-                return [];
-            }
-            return JSON.parse(text);
-        } catch (err) {
-            const error = err as Error;
-            if (error.message.includes("403")) {
-                attempts++;
-                if (attempts >= maxAttempts) {
-                    console.error("Failed to fetch data after 10 attempts:", error);
-                    alert("Failed to fetch data after 10 attempts. Please try again later.");
-                    return;
-                }
-                await delay(1000); // Retry after delay
-            } else {
-                // Handle non-403 errors more gracefully
-                console.error("Error fetching data:", error);
-                return;
-            }
-        }
+const fetchData = async (endpoint: string, method: HttpRequestMethods, token?: string) => {
+    const response = await fetch(url+endpoint, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+    });
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
     }
+    return response.json();
 };

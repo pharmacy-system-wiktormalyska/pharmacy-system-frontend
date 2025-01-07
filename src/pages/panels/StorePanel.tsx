@@ -2,22 +2,9 @@ import {useEffect, useState} from "react";
 import styled from "styled-components";
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
-import ibuprofenImage from '../../assets/images/ibuprofen.jpg';
-import paracetamolImage from '../../assets/images/paracetamol.jpg';
-import acodinImage from '../../assets/images/acodin.jpg';
-import vitamincImage from '../../assets/images/vitaminc.jpg';
-import estradiolImage from '../../assets/images/estradiol.jpg';
-import {fetchBackend} from "../../connection/fetchBackend.tsx";
-import {useAuth} from "../../auth/AuthContext.tsx";
 import {DrugResponse} from "../../values/BackendValues.tsx";
+import {useGetAllDrugs} from "../../connection/hooks/useDrug.tsx";
 
-interface MedicineItem {
-    id: number;
-    name: string;
-    price: number;
-    stock: number;
-    image: string;
-}
 
 interface OrderItem {
     id: number;
@@ -32,44 +19,36 @@ export const StorePanel = () => {
     const [searchQuery, setSearchQuery] = useState("");
     //TODO: add connection to backends interface
     const [drugs, setDrugs] =  useState<DrugResponse[]>([])
-    const {token} = useAuth()
+    const [isLoading, setIsLoading] = useState(true)
+    const {data: fetchedDrugs} = useGetAllDrugs()
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetchBackend("/drug/get/all", "GET", token);
-                if (response) {
-                    setDrugs(response);
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
+        setDrugs(fetchedDrugs)
+        setIsLoading(false)
+    }, [fetchedDrugs]);
 
-        fetchData();
-    }, [token]);
-
-    // const medicines: MedicineItem[] =
+    // const mediczines: MedicineItem[] =
 
     /*TODO:Dodać fetch dla backend */
-    const medicines: MedicineItem[] = [
-        { id: 1, name: "Ibuprofen 200mg", price: 15, stock: 50, image: ibuprofenImage },
-        { id: 2, name: "Paracetamol 500mg", price: 10, stock: 30, image: paracetamolImage },
-        { id: 3, name: "Acodin Duo", price: 40, stock: 20, image: acodinImage },
-        { id: 4, name: "Vitamin C 1000mg", price: 5, stock: 100, image: vitamincImage },
-        { id: 5, name: "Estradiol Valerate", price: 120, stock: 10, image: estradiolImage },
-    ];
 
-    const addToOrder = (medicine: MedicineItem) => {
+    // const medicines: MedicineItem[] = [
+    //     { id: 1, name: "Ibuprofen 200mg", price: 15, stock: 50, image: ibuprofenImage },
+    //     { id: 2, name: "Paracetamol 500mg", price: 10, stock: 30, image: paracetamolImage },
+    //     { id: 3, name: "Acodin Duo", price: 40, stock: 20, image: acodinImage },
+    //     { id: 4, name: "Vitamin C 1000mg", price: 5, stock: 100, image: vitamincImage },
+    //     { id: 5, name: "Estradiol Valerate", price: 120, stock: 10, image: estradiolImage },
+    // ];
+
+    const addToOrder = (drugs: DrugResponse) => {
         setOrderItems((prev) => {
-            const existing = prev.find((item) => item.id === medicine.id);
+            const existing = prev.find((item) => item.id === drugs.id);
 
             if (existing) {
                 return prev.map((item) =>
-                    item.id === medicine.id
+                    item.id === drugs.id
                         ? {
                             ...item,
                             quantity: item.quantity + 1,
-                            total: (item.quantity + 1) * medicine.price,
+                            total: (item.quantity + 1) * drugs.price,
                         }
                         : item
                 );
@@ -77,7 +56,7 @@ export const StorePanel = () => {
 
             return [
                 ...prev,
-                { id: medicine.id, name: medicine.name, quantity: 1, price: medicine.price, total: medicine.price },
+                { id: drugs.id, name: drugs.name, quantity: 1, price: drugs.price, total: drugs.price },
             ];
         });
     };
@@ -102,13 +81,14 @@ export const StorePanel = () => {
         setOrderItems((prev) => prev.filter((item) => item.id !== id));
     };
 
-    const filteredMedicines = medicines.filter((medicine) =>
-        medicine.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredMedicines = (drugs || []).filter((drug) =>
+        drug.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
 
     const totalItems = orderItems.reduce((acc, item) => acc + item.quantity, 0);
     const totalPrice = orderItems.reduce((acc, item) => acc + item.total, 0);
-
+    if (isLoading) return <>Loading...</>
     return (
         <BasePanel title="Store panel" panelKey="store">
             <Container>
@@ -117,7 +97,7 @@ export const StorePanel = () => {
                         <StyledTable>
                             <thead>
                             <tr>
-                                <th>Item Code</th>
+                                <th>Drug Name</th>
                                 <th>Quantity</th>
                                 <th>Price/One</th>
                                 <th>Total</th>
@@ -127,8 +107,9 @@ export const StorePanel = () => {
                             <tbody>
                             {orderItems.map((item) => (
                                 <tr key={item.id}>
-                                    <td>{item.id}</td>
+                                    <td>{item.name}</td>
                                     <td>
+                                        {/*TODO: Użyj tu NumberInputWithArrows*/}
                                         <StyledInput
                                             type="number"
                                             value={item.quantity}
@@ -136,8 +117,8 @@ export const StorePanel = () => {
                                             min="1"
                                         />
                                     </td>
-                                    <td>{item.price} zł</td>
-                                    <td>{item.total} zł</td>
+                                    <td>{item.price && "zł"}</td>
+                                    <td>{item.price && item.price*item.quantity && "zł"}</td>
                                     <td>
                                         <RemoveButton onClick={() => removeFromOrder(item.id)}>Remove</RemoveButton>
                                     </td>
@@ -156,20 +137,19 @@ export const StorePanel = () => {
                     />
                     <ScrollableWrapper>
                         <ScrollableArea>
-                            {filteredMedicines.map((medicine) => (
-                                <MedicineCard key={medicine.id}>
-                                    <MedicineImage src={medicine.image} alt={medicine.name} />
+                            {drugs && filteredMedicines.map((drug) => (
+                                <MedicineCard key={drug.id}>
+                                    <MedicineImage src={drug.image} alt={drug.name} />
                                     <MedicineDetails>
-                                        <MedicineName>{medicine.name}</MedicineName>
+                                        <MedicineName>{drug.name}</MedicineName>
                                     </MedicineDetails>
                                     {/*TODO: Poprawić styl
                                         Usunąć te które są w koszyku
                                         Jeżeli za mało to order to warehouse
                                         wtedy dodaj od razu drug order z iloscia 1 (manager ustawia potem sobie ilosc)
                                     */}
-                                    {medicine.stock}
                                     <ActionButtons>
-                                        <AddButton onClick={() => addToOrder(medicine)}>Add to order</AddButton>
+                                        <AddButton onClick={() => addToOrder(drug)}>Add to order</AddButton>
                                     </ActionButtons>
                                 </MedicineCard>
                             ))}
