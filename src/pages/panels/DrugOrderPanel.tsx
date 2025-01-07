@@ -129,6 +129,7 @@ export const DrugOrderPanel = () => {
         </BasePanel>
     );
 };
+//TODO: Fix React does not recognize the `isSelected` prop on a DOM element.
 const TableRow = styled.tr<{ isSelected: boolean }>`
     background-color: ${({ isSelected }) =>
             isSelected ? "rgba(0,0,0,0.3)" : "transparent"};
