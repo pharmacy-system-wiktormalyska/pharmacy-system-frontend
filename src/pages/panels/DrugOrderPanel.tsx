@@ -1,50 +1,29 @@
 import BasePanel from "../../components/BasePanel.tsx";
 import styled from "styled-components";
 import colorPalette from "../../values/colors.ts";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {StyledTable} from "../../components/StyledTable.tsx";
 import {useAuth} from "../../auth/AuthContext.tsx";
-import {fetchBackend} from "../../connection/fetchBackend.tsx";
-import {DrugOrderResponse, OrderStatus} from "../../values/BackendValues.tsx";
+import {DrugOrderResponse} from "../../values/BackendValues.tsx";
 import {usePopover} from "../../components/popover/PopoverContext.tsx";
 import {AddDrugOrderPopover} from "./DrugOrderPanelComponents/AddDrugOrderPopover.tsx";
 import {UpdateDrugOrderPopover} from "./DrugOrderPanelComponents/UpdateDrugOrderPopover.tsx";
 import {RemoveDrugOrderPopover} from "./DrugOrderPanelComponents/RemoveDrugOrderPopover.tsx";
 import { format } from 'date-fns';
+import {useGetAllDrugOrders} from "../../connection/hooks/useDrugsOrders.tsx";
 
 export const DrugOrderPanel = () => {
     const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[] | null>([]);
     const { token } = useAuth();
-    const hasFetched = useRef(false);
     const {showPopover} = usePopover()
 
     const [selectedRow, setSelectedRow] = useState<DrugOrderResponse | null>(null)
 
-    useEffect(() => {
-        const fetchDrugOrders = async () => {
-            if (!token || hasFetched.current) return;  // Prevent multiple calls
-            hasFetched.current = true;
-            //TODO: Zamienić ID na Nazwy
-            let data:DrugOrderResponse[] = await fetchBackend("/drug/order/get/all", "GET", token);
-            data = [{
-                id: 0,
-                drugId: 1,
-                modificationDateTime: new Date(),
-                orderStatus: OrderStatus.PENDING,
-                managerId: 1,
-                quantity: 1,
-                creationDateTime: new Date(),
-                pharmacistId: 1,
-                isActive: true
-            }]
-            const sortedData = data.sort((a: DrugOrderResponse, b: DrugOrderResponse) => b.id - a.id);
-            setDrugOrders(sortedData);
-        };
+    const {data: allDrugOrders} = useGetAllDrugOrders()
 
-        if (token) {
-            fetchDrugOrders();  // Call only if token is available
-        }
-    }, [token]);  // Dependency on token
+    useEffect(() => {
+        setDrugOrders(allDrugOrders)
+    }, [allDrugOrders]);
 
 
     const showAddPopover = (token:string | null) => {

@@ -1,4 +1,4 @@
-export const url = "https://backend.pharmacy.wiktormalyska.ovh";
+export const url = "https://backend.pharmacy.wiktormalyska.ovh/";
 
 // export const url = "http://localhost:8080";
 export interface DrugOrderResponse {
@@ -21,6 +21,9 @@ export enum OrderStatus {
 export interface DrugResponse {
     id: number;
     name: string;
+    price: number;
+    stock: number;
+    image: string;
     activeSubstance: string;
     atcCode: string;
     commonName: string;

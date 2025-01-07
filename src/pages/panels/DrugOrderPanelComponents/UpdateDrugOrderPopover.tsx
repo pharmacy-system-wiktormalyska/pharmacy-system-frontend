@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import {Button, Dropdown, Form} from "react-bootstrap";
-import {fetchBackend} from "../../../connection/fetchBackend.tsx";
 import {useEffect, useState} from "react";
 import {
     DrugOrderResponse,
@@ -13,8 +12,11 @@ import NumberInputWithArrows from "../../../components/NumberInputWithArrows.tsx
 import {StyledTable} from "../../../components/StyledTable.tsx";
 import colorPalette from "../../../values/colors.ts";
 import {format} from "date-fns";
+import {useGetAllDrugs} from "../../../connection/hooks/useDrug.tsx";
+import {useGetAllManagers} from "../../../connection/hooks/useManagers.tsx";
+import {useGetAllPharmacists} from "../../../connection/hooks/usePharmacist.tsx";
 
-export const UpdateDrugOrderPopover = ({token, drugOrderResponse}: {token: string | null, drugOrderResponse : DrugOrderResponse}) => {
+export const UpdateDrugOrderPopover = ({drugOrderResponse}: {drugOrderResponse : DrugOrderResponse}) => {
     const [drugs, setDrugs] =  useState<DrugResponse[]>([])
     //TODO: Get drugOrderResponse by id
     const [selectedDrug, setSelectedDrug] = useState<DrugResponse>()
@@ -33,56 +35,15 @@ export const UpdateDrugOrderPopover = ({token, drugOrderResponse}: {token: strin
     const [selectedOrderStatus, setSelectedOrderStatus] = useState<string>(OrderStatus[drugOrderResponse.orderStatus])
     const [isActive, setIsActive] = useState<boolean>(drugOrderResponse.isActive)
 
+    const {data: fetchedDrugs} = useGetAllDrugs()
+    const {data: fetchedManagers} = useGetAllManagers()
+    const {data: fetchedPharmacist} = useGetAllPharmacists()
+    
     useEffect(() => {
-        console.log(drugOrderResponse)
-        const fetchDrugs = async () => {
-            try {
-                const response = await fetchBackend("/drug/get/all", "GET", token);
-                if (response) {
-                    setDrugs(response);
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchDrugs().then(() => console.log("Fetched Drug Data"));
-
-
-        const fetchManagers = async () => {
-            const managersFetched:ManagerResponse[] = [
-                {
-                    id: 1,
-                    name: "John",
-                    surname: "Doe",
-                    familyName: "Doe",
-                    placeOfBirth: "City, Country",
-                    dateOfBirth: "1980-01-01",
-                    nationality: "Country",
-                    address: "123 Main St, City, Country",
-                    correspondenceAddress: "456 Correspondence Rd, City, Country",
-                    fathersName: "Robert Doe",
-                    mothersName: "Jane Doe",
-                    education: "Bachelor's Degree in Pharmacy",
-                    pharmacyIds: [101, 102, 103]
-                }
-            ]
-            setManagers(managersFetched)
-
-            /*TODO: Podłącz do bazy */
-
-            // try {
-            //     const response = await fetchBackend("/manager/get/all", "GET", token);
-            //     if (response) {
-            //         setManagers(response);
-            //     }
-            // } catch (error) {
-            //     console.error("Error fetching data:", error);
-            // }
-        };
-
-        fetchManagers().then(() => console.log("Fetched Manager Data"));
-    }, [token]);
+        setDrugs(fetchedDrugs)
+        setManagers(fetchedManagers)
+        setPharmacists(fetchedPharmacist)
+    }, [fetchedDrugs, fetchedManagers, fetchedPharmacist]);
 
     const pickDrug = (drug : DrugResponse) => {
         setSelectedDrug(drug)
