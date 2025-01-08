@@ -1,7 +1,6 @@
 import {APIEndpoints} from "../Endpoints.tsx";
 import {useFetchFromBackend} from "../fetchBackend.tsx";
-
-//TODO: Zrobić tak dla reszty
+import {DrugOrderResponse} from "../../values/BackendValues.tsx";
 
 export const useGetAllDrugOrders = () => {
     const getAll = APIEndpoints.drugOrders.getAll;
@@ -13,9 +12,9 @@ export const useGetDrugOrderById = (id: number) => {
     return useFetchFromBackend(`drugOrders-${id}`, getById.url, getById.method);
 };
 
-export const useAddDrugOrder = () => {
+export const useAddDrugOrder = (drugOrder?:DrugOrderResponse) => {
     const add = APIEndpoints.drugOrders.add;
-    return useFetchFromBackend("drugOrders-add", add.url, add.method);
+    return useFetchFromBackend("drugOrders-add", add.url, add.method, drugOrder);
 };
 
 export const useUpdateDrugOrder = (id: number) => {

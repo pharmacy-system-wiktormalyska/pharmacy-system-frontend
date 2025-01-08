@@ -38,15 +38,6 @@ export const AddDrugOrderPopover = () => {
         setSelectedManagerName(manager.name + " " + manager.familyName)
     }
 
-    const tableHead = () => (
-        <>
-            <th>Select Drug</th>
-            <th>Amount</th>
-            <th>Select Responsible Manager</th>
-            <th></th>
-        </>
-    )
-
     const SubmitDrugOrder = () => {
         if (selectedDrug !== undefined && selectedManager !== undefined ){
             const SubmitRequest: DrugOrderResponse = {
@@ -65,6 +56,16 @@ export const AddDrugOrderPopover = () => {
             console.log(SubmitRequest)
         }
     }
+
+
+    const tableHead = () => (
+        <>
+            <th>Select Drug</th>
+            <th>Amount</th>
+            <th>Select Responsible Manager</th>
+            <th></th>
+        </>
+    )
 
     const tableBody = () => {
 

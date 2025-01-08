@@ -66,3 +66,10 @@ export interface PharmacistResponse {
     education: string;
     pharmacyId: number;
 }
+
+export interface BoughtItemResponse {
+    id: number;
+    drug: DrugResponse
+    quantity: number;
+    price: number;
+}
