@@ -1,15 +1,15 @@
-import BasePanel from "../../components/BasePanel.tsx";
+import BasePanel from "../../../../components/BasePanel.tsx";
 import styled from "styled-components";
-import colorPalette from "../../values/colors.ts";
+import colorPalette from "../../../../values/colors.ts";
 import {useEffect, useState} from "react";
-import {StyledTable} from "../../components/StyledTable.tsx";
-import {DrugOrderResponse} from "../../values/BackendValues.tsx";
-import {usePopover} from "../../components/popover/PopoverContext.tsx";
-import {AddDrugOrderPopover} from "./DrugOrderPanelComponents/AddDrugOrderPopover.tsx";
-import {UpdateDrugOrderPopover} from "./DrugOrderPanelComponents/UpdateDrugOrderPopover.tsx";
-import {RemoveDrugOrderPopover} from "./DrugOrderPanelComponents/RemoveDrugOrderPopover.tsx";
+import {StyledTable} from "../../../../components/StyledTable.tsx";
+import {DrugOrderResponse} from "../../../../values/BackendValues.tsx";
+import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
+import {AddDrugOrderPopover} from "./AddDrugOrderPopover.tsx";
+import {UpdateDrugOrderPopover} from "./UpdateDrugOrderPopover.tsx";
+import {RemoveDrugOrderPopover} from "./RemoveDrugOrderPopover.tsx";
 import { format } from 'date-fns';
-import {useGetAllDrugOrders} from "../../connection/hooks/useDrugsOrders.tsx";
+import {useGetAllDrugOrders} from "../../../../connection/hooks/useDrugsOrders.tsx";
 
 export const DrugOrderPanel = () => {
     const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[] | null>([]);
@@ -21,6 +21,7 @@ export const DrugOrderPanel = () => {
 
     useEffect(() => {
         setDrugOrders(allDrugOrders)
+        console.log(allDrugOrders)
     }, [allDrugOrders]);
 
 
@@ -62,6 +63,7 @@ export const DrugOrderPanel = () => {
 
     const tableBody = () => (
         <>
+
             {drugOrders?.map((order) => (
                 <TableRow
                     key={order.id}
@@ -93,7 +95,7 @@ export const DrugOrderPanel = () => {
     );
 
     return (
-        <BasePanel title="Drug Order Panel">
+        <BasePanel title="Admin Drug Order Panel">
             <Body>
                 <Options>
                     <Option onClick={() => {showAddPopover()}}>Add</Option>

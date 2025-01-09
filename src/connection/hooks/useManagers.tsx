@@ -1,5 +1,6 @@
 import {APIEndpoints} from "../Endpoints.tsx";
-import {useFetchFromBackend} from "../fetchBackend.tsx";
+import {useFetchFromBackend, useMutateToBackend} from "../fetchBackend.tsx";
+import {ManagerResponse} from "../../values/BackendValues.tsx";
 
 export const useGetAllManagers = () => {
     const getAll = APIEndpoints.manager.getAll;
@@ -11,9 +12,9 @@ export const useGetManagerById = (id: number) => {
     return useFetchFromBackend(`manager-${id}`, getById.url, getById.method);
 };
 
-export const useAddManager = () => {
+export const useAddManager = (manager?: ManagerResponse) => {
     const add = APIEndpoints.manager.add;
-    return useFetchFromBackend("manager-add", add.url, add.method);
+    return useMutateToBackend("manager-add", add.url, add.method, manager);
 };
 
 export const useUpdateManager = (id: number) => {

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { StyledTable } from "../../StyledTable.tsx";
 import { Button } from "react-bootstrap";
 import { usePopover } from "../PopoverContext.tsx";
+import React from "react";
 
 interface PaymentPopoverProps {
     boughtItems: BoughtItemResponse[];

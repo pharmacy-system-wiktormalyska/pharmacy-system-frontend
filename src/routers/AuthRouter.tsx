@@ -7,7 +7,8 @@ import OwnerPanel from "../pages/panels/OwnerPanel.tsx";
 import PrescriptionPanel from "../pages/panels/PrescriptionPanel.tsx";
 import WarehousePanel from "../pages/panels/WarehousePanel.tsx";
 import {StorePanel} from "../pages/panels/StorePanel.tsx";
-import {DrugOrderPanel} from "../pages/panels/DrugOrderPanel.tsx";
+import {DrugOrderPanel} from "../pages/panels/admin/DrugOrderPanelComponents/DrugOrderPanel.tsx";
+import {ManagerPanel} from "../pages/panels/admin/ManagerPanelComponents/ManagerPanel.tsx";
 
 const AuthRouter: React.FC = () => {
     const { isAuthenticated } = useAuth();
@@ -28,7 +29,8 @@ const AuthRouter: React.FC = () => {
                 <Route path="prescription" element={<PrescriptionPanel />} />
                 <Route path="warehouse" element={<WarehousePanel />} />
                 <Route path="store" element={<StorePanel />} />
-                <Route path="drug_order" element={<DrugOrderPanel />} />
+                <Route path="admin/drug_order" element={<DrugOrderPanel />} />
+                <Route path="admin/manager" element={<ManagerPanel/>}/>
             </Route>
         </Routes>
     );

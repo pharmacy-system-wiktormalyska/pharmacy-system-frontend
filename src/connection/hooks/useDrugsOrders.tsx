@@ -1,5 +1,5 @@
 import {APIEndpoints} from "../Endpoints.tsx";
-import {useFetchFromBackend} from "../fetchBackend.tsx";
+import {useFetchFromBackend, useMutateToBackend} from "../fetchBackend.tsx";
 import {DrugOrderResponse} from "../../values/BackendValues.tsx";
 
 export const useGetAllDrugOrders = () => {
@@ -14,7 +14,7 @@ export const useGetDrugOrderById = (id: number) => {
 
 export const useAddDrugOrder = (drugOrder?:DrugOrderResponse) => {
     const add = APIEndpoints.drugOrders.add;
-    return useFetchFromBackend("drugOrders-add", add.url, add.method, drugOrder);
+    return useMutateToBackend("drugOrders-add", add.url, add.method, drugOrder || {});
 };
 
 export const useUpdateDrugOrder = (id: number) => {

@@ -1,12 +1,15 @@
 import styled from "styled-components";
 import {Button, Dropdown} from "react-bootstrap";
 import {useEffect, useState} from "react";
-import {DrugOrderResponse, DrugResponse, ManagerResponse, OrderStatus} from "../../../values/BackendValues.tsx";
-import NumberInputWithArrows from "../../../components/NumberInputWithArrows.tsx";
-import {StyledTable} from "../../../components/StyledTable.tsx";
-import colorPalette from "../../../values/colors.ts";
-import {useGetAllDrugs} from "../../../connection/hooks/useDrug.tsx";
-import {useGetAllManagers} from "../../../connection/hooks/useManagers.tsx";
+import {DrugOrderResponse, DrugResponse, ManagerResponse, OrderStatus} from "../../../../values/BackendValues.tsx";
+import NumberInputWithArrows from "../../../../components/NumberInputWithArrows.tsx";
+import {StyledTable} from "../../../../components/StyledTable.tsx";
+import colorPalette from "../../../../values/colors.ts";
+import {useGetAllDrugs} from "../../../../connection/hooks/useDrug.tsx";
+import {useGetAllManagers} from "../../../../connection/hooks/useManagers.tsx";
+import {useAuth} from "../../../../auth/AuthContext.tsx";
+import {useAddDrugOrder} from "../../../../connection/hooks/useDrugsOrders.tsx";
+import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
 
 export const AddDrugOrderPopover = () => {
     const [drugs, setDrugs] =  useState<DrugResponse[]>([])
@@ -22,6 +25,13 @@ export const AddDrugOrderPopover = () => {
     const [isLoading, setIsLoading] = useState(true)
     const {data: fetchedDrugs} = useGetAllDrugs()
     const {data: fetchedManagers} = useGetAllManagers()
+
+    const {storedDecodedToken} = useAuth()
+
+    const {mutate: addDrugOrder} = useAddDrugOrder()
+
+    const {hidePopover} = usePopover()
+
     useEffect(() => {
         setDrugs(fetchedDrugs)
         setManagers(fetchedManagers)
@@ -40,20 +50,19 @@ export const AddDrugOrderPopover = () => {
 
     const SubmitDrugOrder = () => {
         if (selectedDrug !== undefined && selectedManager !== undefined ){
-            const SubmitRequest: DrugOrderResponse = {
+            const submitRequest: DrugOrderResponse = {
                 id: 0,
                 drugId: selectedDrug.id,
                 isActive: true,
                 creationDateTime: new Date(),
                 orderStatus: OrderStatus.PENDING,
                 managerId: selectedManager.id,
-                /*TODO: Dodać z JWT*/
-                pharmacistId: 0,
+                pharmacistId: storedDecodedToken?.user_id || 0,
                 quantity: amount,
                 modificationDateTime: new Date()
             }
-            //TODO: Add post to backend
-            console.log(SubmitRequest)
+            addDrugOrder(submitRequest)
+            hidePopover()
         }
     }
 
@@ -70,10 +79,11 @@ export const AddDrugOrderPopover = () => {
     const tableBody = () => {
 
 
-        const handleAmountChange = (newAmount: number) => {
+        const handleAmountChange = (newAmount: number, id: number | undefined) => {
+            console.log(id)
             setAmount(newAmount);
         };
-        if (isLoading) return (<>Loading...</>)
+        if (isLoading) return (<tr><td>Loading...</td></tr>)
 
         const safeDrugs = drugs || [];
         const safeManagers = managers || [];
@@ -161,9 +171,12 @@ const Content = styled.div`
     align-content: center;
     align-items: center;
     justify-content: flex-start;
-    width: 100%;
+    width: auto; /* Zmień szerokość na automatyczną */
+    max-width: 100%; /* Opcjonalnie ustaw maksymalną szerokość */
     padding: 1rem;
-`
+    overflow: visible; /* Upewnij się, że nie ma ukrycia zawartości */
+`;
+
 
 const Title = styled.div`
     padding-top: 1rem;

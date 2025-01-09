@@ -13,22 +13,24 @@ export enum HttpRequestMethods{
     TRACE = 'TRACE',
     CONNECT = 'CONNECT',
 }
-//TODO: Upewnic czy działa
-export const useFetchFromBackend = (key: string, endpoint: string, method: HttpRequestMethods, body?: object) => {
+export const useFetchFromBackend = (key: string, endpoint: string, method: HttpRequestMethods) => {
     const { token } = useAuth();
 
-    const query = useQuery({
+    return useQuery({
         queryKey: [key, endpoint, method],
-        queryFn: () => fetchData(endpoint, method, token || "", body),
+        queryFn: () => fetchData(endpoint, method, token || ""),
         retry: true,
-    });
+    })
+};
 
-    const mutation = useMutation({
+
+export const useMutateToBackend = (key: string, endpoint: string, method: HttpRequestMethods, initialBody?: object) => {
+    const { token } = useAuth();
+
+    return useMutation({
         mutationKey: [key, endpoint, method],
-        mutationFn: (body: object) => fetchData(endpoint, method, token || "", body),
+        mutationFn: (body: object = initialBody || {}) => fetchData(endpoint, method, token || "", body),
     });
-
-    return method === HttpRequestMethods.GET ? query : mutation;
 };
 
 

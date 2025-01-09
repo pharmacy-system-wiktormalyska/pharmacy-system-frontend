@@ -2,13 +2,22 @@ import {useEffect, useState} from "react";
 import styled from "styled-components";
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
-import {BoughtItemResponse, DrugOrderResponse, DrugResponse, OrderStatus} from "../../values/BackendValues.tsx";
+import {
+    BoughtItemResponse,
+    DrugOrderResponse,
+    DrugResponse,
+    OrderStatus,
+    PharmacistResponse,
+    url
+} from "../../values/BackendValues.tsx";
 import {useGetAllDrugs} from "../../connection/hooks/useDrug.tsx";
 import {usePopover} from "../../components/popover/PopoverContext.tsx";
 import {PaymentPopover} from "../../components/popover/popoverImpl/PaymentPopover.tsx";
 import {StyledTable} from "../../components/StyledTable.tsx";
 import NumberInputWithArrows from "../../components/NumberInputWithArrows.tsx";
 import {useAddDrugOrder} from "../../connection/hooks/useDrugsOrders.tsx";
+import {useAuth} from "../../auth/AuthContext.tsx";
+import {useGetAllPharmacists} from "../../connection/hooks/usePharmacist.tsx";
 
 export const StorePanel = () => {
     const [orderItems, setOrderItems] = useState<BoughtItemResponse[]>([]);
@@ -18,12 +27,15 @@ export const StorePanel = () => {
 
     const {data: fetchedDrugs} = useGetAllDrugs()
     const {mutate: addDrugOrder} = useAddDrugOrder()
+    const {data: fetchedPharmacists} = useGetAllPharmacists()
     const {showPopover} = usePopover()
+
+    const {storedDecodedToken} = useAuth()
 
     useEffect(() => {
         setDrugs(fetchedDrugs)
         setIsLoading(false)
-    }, [fetchedDrugs]);
+    }, [drugs, fetchedDrugs]);
 
     const addToOrder = (drug: DrugResponse) => {
         setOrderItems((prev) => {
@@ -64,19 +76,28 @@ export const StorePanel = () => {
     };
 
     const orderDrug = (drug: DrugResponse) => {
-        //TODO: ID zmienić na te z jwt, tak samo z manager
+        const pharmacistID = storedDecodedToken?.user_id || 0
+        const pharmacist = fetchedPharmacists.find((fetchedPharmacist: PharmacistResponse) => fetchedPharmacist.id === pharmacistID);
+        let managerID = 0
+        if (!pharmacist || pharmacist.managerId === undefined) {
+            managerID = 0;
+        } else {
+            managerID = pharmacist.managerId;
+        }
+
         const drugOrder:DrugOrderResponse = {
             id: 0,
             drugId: drug.id,
             isActive: true,
             orderStatus: OrderStatus.PENDING,
-            pharmacistId: 0,
-            managerId: 0,
+            pharmacistId: pharmacistID,
+            managerId: managerID,
             creationDateTime: new Date(),
             modificationDateTime: new Date(),
             quantity: 1
         }
         addDrugOrder(drugOrder)
+        alert("Requested order of drug: "+drug.name)
     }
 
 
@@ -109,7 +130,7 @@ export const StorePanel = () => {
             showPopover(<PaymentPopover boughtItems={orderItems} />)
         setOrderItems([])
     }
-    const handleAmountChange = (id: number | undefined, newAmount: number) => {
+    const handleAmountChange = (newAmount: number, id: number | undefined) => {
         if (id !== undefined) {
             updateQuantity(id, newAmount);
         } else {
@@ -174,17 +195,24 @@ export const StorePanel = () => {
                         <ScrollableArea>
                             {drugs && filteredMedicines.map((drug) => (
                                 <MedicineCard key={drug.id}>
-                                    <MedicineImage src={drug.image} alt={drug.name} />
+                                    <MedicineImage src={url+"static/"+drug.relativeImageUrl} alt={drug.name} />
                                     <MedicineDetails>
                                         <MedicineName>{drug.name}</MedicineName>
                                     </MedicineDetails>
-                                    {/*TODO: Poprawić styl
-                                        Jeżeli za mało to order to warehouse
-                                        wtedy dodaj od razu drug order z iloscia 1 (manager ustawia potem sobie ilosc)
-                                    */}
-                                    <InStock>
-                                        In Stock: {drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0) }
-                                    </InStock>
+                                    {
+                                        (drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0)) !== 0
+                                        ? (
+                                                <InStock>
+                                                    In Stock: {drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0) }
+                                                </InStock>
+                                          )
+                                            : (
+                                                <InStock style={{backgroundColor: "red"}}>
+                                                    In Stock: {drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0) }
+                                                </InStock>
+                                            )
+                                    }
+
                                     <ActionButtons>
                                         {
                                             (drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0)) !== 0

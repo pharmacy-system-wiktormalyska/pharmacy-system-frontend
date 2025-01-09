@@ -23,7 +23,7 @@ export interface DrugResponse {
     name: string;
     price: number;
     stock: number;
-    image: string;
+    relativeImageUrl: string;
     activeSubstance: string;
     atcCode: string;
     commonName: string;
@@ -65,6 +65,7 @@ export interface PharmacistResponse {
     mothersName: string;
     education: string;
     pharmacyId: number;
+    managerId: number;
 }
 
 export interface BoughtItemResponse {
@@ -72,4 +73,17 @@ export interface BoughtItemResponse {
     drug: DrugResponse
     quantity: number;
     price: number;
+}
+
+
+export interface PharmacyResponse {
+    id: number;
+    pharmacyId: number;
+    name: string;
+    address: string;
+    type: 'APTEKA_OGOLNODOSTEPNA';
+    owner: string;
+    phone: string;
+    email: string;
+    website: string;
 }

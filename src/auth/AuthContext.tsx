@@ -8,6 +8,7 @@ export interface DecodedTokenType {
     iat: number;
     exp: number;
     authorities: string[];
+    user_id: number
 }
 
 interface AuthContextType {

@@ -9,8 +9,9 @@ import {Routes, Route} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PrescriptionPanel from "./panels/PrescriptionPanel.tsx";
 import {StorePanel} from "./panels/StorePanel.tsx";
-import {DrugOrderPanel} from "./panels/DrugOrderPanel.tsx";
+import {DrugOrderPanel} from "./panels/admin/DrugOrderPanelComponents/DrugOrderPanel.tsx";
 import {useAuth} from "../auth/AuthContext.tsx";
+import {ManagerPanel} from "./panels/admin/ManagerPanelComponents/ManagerPanel.tsx";
 
 export const MainPage = () => {
     const [name, setName] = useState('')
@@ -31,7 +32,8 @@ export const MainPage = () => {
                         <Route path="/prescription" element={<PrescriptionPanel/>}/>
                         <Route path="/warehouse" element={<WarehousePanel/>}/>
                         <Route path="/store" element={<StorePanel/>}/>
-                        <Route path="/drug_order" element={<DrugOrderPanel/>}/>
+                        <Route path="/admin/drug_order" element={<DrugOrderPanel/>}/>
+                        <Route path="/admin/manager" element={<ManagerPanel/>}/>
                     </Routes>
             </SwappableComponent>
         </Master>

@@ -17,7 +17,7 @@ export const rolesGetter: role[] = [
         allowedPanels: ["prescription", "sell", "order", "warehouse_view"]
     },
     {
-        name: "Warehouse Manager",
+        name: "WAREHOUSE MANAGER",
         id: 2,
         allowedPanels: ["warehouse_edit"]
     },

@@ -9,7 +9,7 @@ interface NumberInputWithArrowsProps {
     min?: number
     max: number
     base_amount? : number
-    onValueChange : (id: number | undefined, number: number) => void
+    onValueChange : (number: number, id: number | undefined) => void
 }
 
 const NumberInputWithArrows = ({id = 0,label, max, min = 1, base_amount = 1, onValueChange}:NumberInputWithArrowsProps) => {

@@ -6,6 +6,7 @@ interface StyledTableProps {
     tbody: React.ReactNode | (() => React.ReactNode)
 }
 
+//TODO: Napisać podział tabeli na 2 części
 export const StyledTable = ({thead, tbody}:StyledTableProps) => {
     const renderContent = (content: React.ReactNode | (() => React.ReactNode)) => {
         return typeof content === "function" ? content() : content;
@@ -28,21 +29,23 @@ export const StyledTable = ({thead, tbody}:StyledTableProps) => {
 }
 
 const StyledTableContainer = styled.div`
-    width: 100%;
-    max-width: 1200px;
+    width: auto; /* Dynamiczna szerokość */
+    max-width: 100%; /* Opcjonalnie ograniczenie szerokości */
     margin: 0 auto;
     display: flex;
     justify-content: center;
-    overflow: visible;
+    overflow-x: auto; /* Dodanie przewijania w poziomie, jeśli tabela wykracza poza ekran */
+    padding: 1rem; /* Opcjonalnie dla estetyki */
 `;
 
+
 const StyledTableComponent = styled.table`
-    width: 100%;
+    width: auto; /* Dopasowanie do zawartości */
+    min-width: 100%; /* Minimalna szerokość */
     border-collapse: separate;
     border-spacing: 0;
     background-color: ${colorPalette.lightBackground.hex};
-    border-radius: 10px;
-    overflow: visible;
+    border-radius: 1rem;
 
     th, td {
         padding: 15px;
@@ -75,3 +78,4 @@ const StyledTableComponent = styled.table`
         }
     }
 `;
+
