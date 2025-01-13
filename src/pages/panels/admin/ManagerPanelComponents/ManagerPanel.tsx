@@ -10,7 +10,7 @@ import {UpdateManagerPopover} from "./UpdateManagerPopover.tsx";
 import {RemoveManagerPopover} from "./RemoveManagerPopover.tsx";
 import { format } from 'date-fns';
 import {useGetAllManagers} from "../../../../connection/hooks/useManagers.tsx";
-
+//TODO: Implement Remove and Update
 export const ManagerPanel = () => {
     const [managers, setManagers] = useState<ManagerResponse[] | null>([]);
     const {showPopover} = usePopover()
@@ -60,7 +60,7 @@ export const ManagerPanel = () => {
             <th>Fathers Name</th>
             <th>Mothers Name</th>
             <th>Education</th>
-            <th>Pharmacies ID's</th>
+            <th>Pharmacy ID</th>
         </>
     );
 
@@ -85,7 +85,7 @@ export const ManagerPanel = () => {
                     <td>{manager.fathersName}</td>
                     <td>{manager.mothersName}</td>
                     <td>{manager.education}</td>
-                    <td>{manager.pharmacyIds}</td>
+                    <td>{manager.pharmacyId}</td>
                 </TableRow>
             ))}
         </>

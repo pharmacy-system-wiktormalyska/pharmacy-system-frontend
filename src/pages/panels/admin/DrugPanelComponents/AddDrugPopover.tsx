@@ -11,7 +11,7 @@ import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
 import {useGetAllPharmacies} from "../../../../connection/hooks/usePharmacy.tsx";
 import {StyledTable2Rowed} from "../../../../components/StyledTable2Rowed.tsx";
 
-export const AddManagerPopover = () => {
+export const AddDrugPopover = () => {
     const [pharmacies, setPharmacies] =  useState<PharmacyResponse[]>([])
     const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyResponse>()
     const [selectedPharmacyName, setSelectedPharmacyName] = useState<string>("Select Pharmacy")

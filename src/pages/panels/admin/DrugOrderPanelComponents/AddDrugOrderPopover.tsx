@@ -47,19 +47,21 @@ export const AddDrugOrderPopover = () => {
         setSelectedManager(manager)
         setSelectedManagerName(manager.name + " " + manager.familyName)
     }
-
+    //TODO: Poprawić jak bedzie endpoint
     const SubmitDrugOrder = () => {
         if (selectedDrug !== undefined && selectedManager !== undefined ){
             const submitRequest: DrugOrderResponse = {
                 id: 0,
                 drugId: selectedDrug.id,
-                isActive: true,
                 creationDateTime: new Date(),
                 orderStatus: OrderStatus.PENDING,
                 managerId: selectedManager.id,
                 pharmacistId: storedDecodedToken?.user_id || 0,
                 quantity: amount,
-                modificationDateTime: new Date()
+                modificationDateTime: new Date(),
+                warehouseId: 0,
+                isActive: true,
+                completionDateTime: null
             }
             addDrugOrder(submitRequest)
             hidePopover()

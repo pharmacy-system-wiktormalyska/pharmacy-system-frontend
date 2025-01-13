@@ -3,7 +3,7 @@ import styled from "styled-components";
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
 import {
-    BoughtItemResponse,
+    OrderItemResponse,
     DrugOrderResponse,
     DrugResponse,
     OrderStatus,
@@ -20,7 +20,7 @@ import {useAuth} from "../../auth/AuthContext.tsx";
 import {useGetAllPharmacists} from "../../connection/hooks/usePharmacist.tsx";
 
 export const StorePanel = () => {
-    const [orderItems, setOrderItems] = useState<BoughtItemResponse[]>([]);
+    const [orderItems, setOrderItems] = useState<OrderItemResponse[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [drugs, setDrugs] =  useState<DrugResponse[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -36,7 +36,7 @@ export const StorePanel = () => {
         setDrugs(fetchedDrugs)
         setIsLoading(false)
     }, [drugs, fetchedDrugs]);
-
+    //TODO: Poprawić drug z warestock
     const addToOrder = (drug: DrugResponse) => {
         setOrderItems((prev) => {
             const amountInCart = orderItems.find(order => order.drug.id === drug.id)?.quantity || 0

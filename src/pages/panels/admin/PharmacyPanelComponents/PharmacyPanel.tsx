@@ -3,88 +3,96 @@ import styled from "styled-components";
 import colorPalette from "../../../../values/colors.ts";
 import {useEffect, useState} from "react";
 import {StyledTable} from "../../../../components/StyledTable.tsx";
-import {DrugOrderResponse} from "../../../../values/BackendValues.tsx";
+import {ManagerResponse} from "../../../../values/BackendValues.tsx";
 import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
-import {AddDrugOrderPopover} from "./AddDrugOrderPopover.tsx";
-import {UpdateDrugOrderPopover} from "./UpdateDrugOrderPopover.tsx";
-import {RemoveDrugOrderPopover} from "./RemoveDrugOrderPopover.tsx";
+import {AddPharmacyPopover} from "./AddPharmacyPopover.tsx";
+import {UpdatePharmacyPopover} from "./UpdatePharmacyPopover.tsx";
+import {RemovePharmacyPopover} from "./RemovePharmacyPopover.tsx";
 import { format } from 'date-fns';
-import {useGetAllDrugOrders} from "../../../../connection/hooks/useDrugsOrders.tsx";
-//TODO: Implement Remove and Update
-export const DrugOrderPanel = () => {
-    const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[] | null>([]);
+import {useGetAllManagers} from "../../../../connection/hooks/useManagers.tsx";
+//TODO: Implement All
+export const PharmacyPanel = () => {
+    const [managers, setManagers] = useState<ManagerResponse[] | null>([]);
     const {showPopover} = usePopover()
 
-    const [selectedRow, setSelectedRow] = useState<DrugOrderResponse | null>(null)
+    const [selectedRow, setSelectedRow] = useState<ManagerResponse | null>(null)
 
-    const {data: allDrugOrders} = useGetAllDrugOrders()
+    const {data: allManagers} = useGetAllManagers()
 
     useEffect(() => {
-        setDrugOrders(allDrugOrders)
-        console.log(allDrugOrders)
-    }, [allDrugOrders]);
+        setManagers(allManagers)
+        console.log(allManagers)
+    }, [allManagers]);
 
 
     const showAddPopover = () => {
-        showPopover(<AddDrugOrderPopover/>)
+        showPopover(<AddPharmacyPopover/>)
         setSelectedRow(null)
     }
 
     const showUpdatePopover = () => {
         if (selectedRow !== null) {
-            showPopover(<UpdateDrugOrderPopover drugOrderResponse={selectedRow}/>)
+            showPopover(<UpdatePharmacyPopover managerResponse={selectedRow}/>)
             setSelectedRow(null)
         }
     }
     const showRemovePopover = () => {
         if (selectedRow !== null) {
-            showPopover(RemoveDrugOrderPopover())
+            showPopover(RemovePharmacyPopover())
             setSelectedRow(null)
         }
     }
 
-    const handleRowClick = (order: DrugOrderResponse) => {
+    const handleRowClick = (order: ManagerResponse) => {
         setSelectedRow(order)
     };
 
     const tableHead = () => (
         <>
-            <th>Order ID</th>
-            <th>Drug ID</th>
-            <th>Warehouse ID</th>
-            <th>Quantity</th>
-            <th>Pharmacist ID</th>
             <th>Manager ID</th>
-            <th>Order Status</th>
-            <th>Creation Date Time</th>
-            <th>Modification Date Time</th>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Family Name</th>
+            <th>Place of Birth</th>
+            <th>Nationality</th>
+            <th>Address</th>
+            <th>Correspondence Address</th>
+            <th>Fathers Name</th>
+            <th>Mothers Name</th>
+            <th>Education</th>
+            <th>Pharmacy ID</th>
         </>
     );
 
     const tableBody = () => (
         <>
-            {drugOrders?.map((order) => (
+
+            {managers?.map((manager) => (
                 <TableRow
-                    key={order.id}
-                    onClick={() => handleRowClick(order)}
-                    isSelected={selectedRow!==null && selectedRow.id === order.id}
+                    key={manager.id}
+                    onClick={() => handleRowClick(manager)}
+                    isSelected={selectedRow !== null && selectedRow.id === manager.id}
                 >
-                    <td>{order.id}</td>
-                    <td>{order.drugId}</td>
-                    <td>{order.warehouseId}</td>
-                    <td>{order.quantity}</td>
-                    <td>{order.pharmacistId}</td>
-                    <td>{order.managerId}</td>
-                    <td>{order.orderStatus}</td>
-                    <td>{format(order.creationDateTime, 'yyyy/MM/dd')}</td>
-                    <td>{format(order.modificationDateTime, 'yyyy/MM/dd')}</td>
+                    <td>{manager.id}</td>
+                    <td>{manager.name}</td>
+                    <td>{manager.surname}</td>
+                    <td>{manager.familyName}</td>
+                    <td>{manager.placeOfBirth}</td>
+                    <td>{format(manager.dateOfBirth, 'yyyy/MM/dd')}</td>
+                    <td>{manager.nationality}</td>
+                    <td>{manager.address}</td>
+                    <td>{manager.correspondenceAddress}</td>
+                    <td>{manager.fathersName}</td>
+                    <td>{manager.mothersName}</td>
+                    <td>{manager.education}</td>
+                    <td>{manager.pharmacyId}</td>
                 </TableRow>
             ))}
         </>
     );
 
     return (
-        <BasePanel title="Admin Drug Order Panel">
+        <BasePanel title="Admin Manager Panel">
             <Body>
                 <Options>
                     <Option onClick={() => {showAddPopover()}}>Add</Option>

@@ -2,11 +2,13 @@ import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
 
 interface StyledTableProps {
-    thead: React.ReactNode | (() => React.ReactNode)
-    tbody: React.ReactNode | (() => React.ReactNode)
+    thead1: React.ReactNode | (() => React.ReactNode)
+    thead2: React.ReactNode | (() => React.ReactNode)
+    tbody1: React.ReactNode | (() => React.ReactNode)
+    tbody2: React.ReactNode | (() => React.ReactNode)
 }
 
-export const StyledTable = ({thead, tbody}:StyledTableProps) => {
+export const StyledTable2Rowed = ({thead1, tbody1, thead2, tbody2}:StyledTableProps) => {
     const renderContent = (content: React.ReactNode | (() => React.ReactNode)) => {
         return typeof content === "function" ? content() : content;
     };
@@ -15,11 +17,19 @@ export const StyledTable = ({thead, tbody}:StyledTableProps) => {
             <StyledTableComponent>
                 <thead>
                 <tr>
-                    {renderContent(thead)}
+                    {renderContent(thead1)}
                 </tr>
                 </thead>
                 <tbody>
-                    {renderContent(tbody)}
+                {renderContent(tbody1)}
+                </tbody>
+                <thead>
+                <tr>
+                    {renderContent(thead2)}
+                </tr>
+                </thead>
+                <tbody>
+                {renderContent(tbody2)}
                 </tbody>
             </StyledTableComponent>
         </StyledTableContainer>

@@ -26,6 +26,7 @@ const WarehousePanel = () => {
     const [activeTab, setActiveTab] = useState<string | 'warehouse'>('warehouse');
     const [selectedDetails, setSelectedDetails] = useState<WarehouseItem | RequestItem | null>(null);
 
+    //TODO: Czytać z backend
     const warehouseData: WarehouseItem[] = [
         { name: 'Estradiol Valerate', number: 'EV001', expiry: '2025-08-15', price: '120 zł', stock: 200, description: 'A long-acting estrogen used in feminizing hormone replacement therapy :3' },
         { name: 'Ibuprofen 400mg', number: 'IB002', expiry: '2026-01-10', price: '15 zł', stock: 500, description: 'A common pain reliever used to treat inflammation, headaches, and minor aches' },

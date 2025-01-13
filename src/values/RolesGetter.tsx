@@ -3,8 +3,6 @@ interface role {
     id: number,
     allowedPanels: string[]
 }
-
-//TODO: Stworzone do mockowania i brać z tokenu jaki ma
 export const rolesGetter: role[] = [
     {
         name:"ADMINISTRATOR",
