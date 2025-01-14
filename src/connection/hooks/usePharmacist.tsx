@@ -6,9 +6,9 @@ export const useGetAllPharmacists = () => {
     return useFetchFromBackend("pharmacist", getAll.url, getAll.method);
 };
 
-export const useGetPharmacistById = (id: number) => {
-    const getById = APIEndpoints.pharmacist.getById(id);
-    return useFetchFromBackend(`pharmacist-${id}`, getById.url, getById.method);
+export const useGetPharmacistById = () => {
+    const getById = APIEndpoints.pharmacist.getById();
+    return useFetchFromBackend(`pharmacist`, getById.url, getById.method);
 };
 
 export const useAddPharmacist = () => {
@@ -16,12 +16,12 @@ export const useAddPharmacist = () => {
     return useFetchFromBackend("pharmacist-add", add.url, add.method);
 };
 
-export const useUpdatePharmacist = (id: number) => {
-    const update = APIEndpoints.pharmacist.update(id);
-    return useFetchFromBackend(`pharmacist-update-${id}`, update.url, update.method);
+export const useUpdatePharmacist = () => {
+    const update = APIEndpoints.pharmacist.update();
+    return useFetchFromBackend(`pharmacist-update`, update.url, update.method);
 };
 
-export const useRemovePharmacist = (id: number) => {
-    const remove = APIEndpoints.pharmacist.remove(id);
-    return useFetchFromBackend(`pharmacist-remove-${id}`, remove.url, remove.method);
+export const useRemovePharmacist = () => {
+    const remove = APIEndpoints.pharmacist.remove();
+    return useFetchFromBackend(`pharmacist-remove`, remove.url, remove.method);
 };
