@@ -31,6 +31,8 @@ export interface DrugResponse {
     atcCode: string;
     strength: string;
     relativeImageUrl: string;
+    modificationDateTime: Date | null
+    active: boolean | true
 }
 
 export interface ManagerResponse {

@@ -24,15 +24,27 @@ export const useFetchFromBackend = (key: string, endpoint: string, method: HttpR
 };
 
 
-export const useMutateToBackend = (key: string, endpoint: string, method: HttpRequestMethods, initialBody?: object) => {
+export const useMutateToBackend = (key: string, endpoint: string, method: HttpRequestMethods) => {
     const { token } = useAuth();
 
     return useMutation({
         mutationKey: [key, endpoint, method],
-        mutationFn: (body: object = initialBody || {}) => fetchData(endpoint, method, token || "", body),
+        mutationFn: (body: object) => fetchData(endpoint, method, token || "", body),
     });
 };
 
+export const usePathParamsToBackend = (key: string, endpoint: string, method: HttpRequestMethods) => {
+    const { token } = useAuth();
+    interface mutationParams {
+        param: string,
+        body?: object
+    }
+
+    return useMutation({
+        mutationKey: [key, endpoint, method],
+        mutationFn: ({param, body}: mutationParams) => fetchData(endpoint+"/"+param, method, token || "", body),
+    });
+};
 
 const fetchData = async (endpoint: string, method: HttpRequestMethods, token?: string, body?:object) => {
     const response = await fetch(url+endpoint, {

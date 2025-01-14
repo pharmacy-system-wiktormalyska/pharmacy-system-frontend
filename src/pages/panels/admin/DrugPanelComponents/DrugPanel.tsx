@@ -7,8 +7,9 @@ import {DrugResponse} from "../../../../values/BackendValues.tsx";
 import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
 import {AddDrugPopover} from "./AddDrugPopover.tsx";
 import {UpdateDrugPopover} from "./UpdateDrugPopover.tsx";
-import {RemoveDrugPopover} from "./RemoveDrugPopover.tsx";
 import {useGetAllDrugs} from "../../../../connection/hooks/useDrug.tsx";
+import {RemoveDrugPopover} from "./RemoveDrugPopover.tsx";
+import {Checkbox} from "../../../../components/Chechbox.tsx";
 //TODO: Implement All
 export const DrugPanel = () => {
     const [drugs, setDrugs] = useState<DrugResponse[] | null>([]);
@@ -16,28 +17,32 @@ export const DrugPanel = () => {
 
     const [selectedRow, setSelectedRow] = useState<DrugResponse | null>(null)
 
-    const {data: allDrugs} = useGetAllDrugs()
+    const {data: allDrugs, refetch} = useGetAllDrugs()
 
     useEffect(() => {
         setDrugs(allDrugs)
-        console.log(allDrugs)
     }, [allDrugs]);
 
+    const refreshData = () => {
+        setTimeout(() => {
+        refetch().then(() => {});
+        }, 1000);
+    }
 
     const showAddPopover = () => {
-        showPopover(<AddDrugPopover/>)
+        showPopover(<AddDrugPopover onActionComplete={refreshData}/>)
         setSelectedRow(null)
     }
 
     const showUpdatePopover = () => {
         if (selectedRow !== null) {
-            showPopover(<UpdateDrugPopover drugResponse={selectedRow}/>)
+            showPopover(<UpdateDrugPopover drugResponse={selectedRow} onActionComplete={refreshData}/>)
             setSelectedRow(null)
         }
     }
     const showRemovePopover = () => {
         if (selectedRow !== null) {
-            showPopover(RemoveDrugPopover())
+            showPopover(<RemoveDrugPopover drug={selectedRow} onActionComplete={refreshData}/>)
             setSelectedRow(null)
         }
     }
@@ -58,13 +63,15 @@ export const DrugPanel = () => {
             <th>ATC Code</th>
             <th>Strength</th>
             <th>Image URL</th>
+            <th>Is Active</th>
         </>
     );
 
     const tableBody = () => (
         <>
 
-            {drugs?.map((drug) => (
+            {drugs?.map((drug) => {
+                return(
                 <TableRow
                     key={drug.id}
                     onClick={() => handleRowClick(drug)}
@@ -80,8 +87,16 @@ export const DrugPanel = () => {
                     <td>{drug.atcCode}</td>
                     <td>{drug.strength}</td>
                     <td>{drug.relativeImageUrl}</td>
+                    <td>
+                        <Checkbox
+                            type={"checkbox"}
+                            id={`default-checkbox`}
+                            checked={drug.active}
+                            readOnly={true.valueOf()}
+                        />
+                    </td>
                 </TableRow>
-            ))}
+            )})}
         </>
     );
 
@@ -100,7 +115,9 @@ export const DrugPanel = () => {
     );
 };
 //TODO: Fix React does not recognize the `isSelected` prop on a DOM element.
-const TableRow = styled.tr<{ isSelected: boolean }>`
+const TableRow = styled.tr.withConfig({
+    shouldForwardProp: (prop) => prop !== 'isSelected',
+})<{ isSelected: boolean }>`
     background-color: ${({ isSelected }) =>
             isSelected ? "rgba(0,0,0,0.3)" : "transparent"};
     cursor: pointer;
@@ -109,6 +126,7 @@ const TableRow = styled.tr<{ isSelected: boolean }>`
         background-color: rgba(0, 0, 0, 0.2);
     }
 `;
+
 const Body = styled.div`
     width: 100%;
     height: 100%;
@@ -143,3 +161,4 @@ const Option = styled.div`
         background-color: ${colorPalette.buttonHover.hex};
     }
 `;
+

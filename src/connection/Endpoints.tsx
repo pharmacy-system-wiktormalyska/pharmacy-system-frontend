@@ -8,45 +8,45 @@ export interface Endpoint {
 export const APIEndpoints: {
     drugOrders: {
         getAll: Endpoint;
-        getById: (id: number) => Endpoint;
+        getById: () => Endpoint;
         add: Endpoint;
-        update: (id: number) => Endpoint;
-        remove: (id: number) => Endpoint;
+        update: () => Endpoint;
+        remove: () => Endpoint;
     },
     administrator: {
         getAll: Endpoint
-        getById: (id: number) => Endpoint
+        getById: () => Endpoint
         add: Endpoint
-        update: (id: number) => Endpoint
-        remove: (id: number) => Endpoint
+        update: () => Endpoint
+        remove: () => Endpoint
     },
     pharmacy: {
         getAll: Endpoint;
-        getById: (id: number) => Endpoint;
+        getById: () => Endpoint;
         add: Endpoint;
-        update: (id: number) => Endpoint;
-        remove: (id: number) => Endpoint;
+        update: () => Endpoint;
+        remove: () => Endpoint;
     };
     pharmacist: {
         getAll: Endpoint;
-        getById: (id: number) => Endpoint;
+        getById: () => Endpoint;
         add: Endpoint;
-        update: (id: number) => Endpoint;
-        remove: (id: number) => Endpoint;
+        update: () => Endpoint;
+        remove: () => Endpoint;
     };
     drug: {
         getAll: Endpoint;
-        getById: (id: number) => Endpoint;
+        getById: () => Endpoint;
         add: Endpoint;
-        update: (id: number) => Endpoint;
-        remove: (id: number) => Endpoint;
+        update: () => Endpoint;
+        remove: () => Endpoint;
     };
     manager: {
         getAll: Endpoint;
-        getById: (id: number) => Endpoint;
+        getById: () => Endpoint;
         add: Endpoint;
-        update: (id: number) => Endpoint;
-        remove: (id: number) => Endpoint;
+        update: () => Endpoint;
+        remove: () => Endpoint;
     };
 } = {
     drugOrders: {
@@ -54,20 +54,20 @@ export const APIEndpoints: {
             url: "drug/order/get/all",
             method: HttpRequestMethods.GET,
         },
-        getById: (id: number) => ({
-            url: `drug/order/get/${id}`,
+        getById: () => ({
+            url: `drug/order/get`,
             method: HttpRequestMethods.GET,
         }),
         add: {
             url: "drug/order/add",
             method: HttpRequestMethods.POST,
         },
-        update: (id: number) => ({
-            url: `drug/order/update/${id}`,
+        update: () => ({
+            url: `drug/order/update`,
             method: HttpRequestMethods.PUT,
         }),
-        remove: (id: number) => ({
-            url: `drug/order/remove/${id}`,
+        remove: () => ({
+            url: `drug/order/remove/id`,
             method: HttpRequestMethods.DELETE,
         }),
     },
@@ -76,20 +76,20 @@ export const APIEndpoints: {
             url: "administrator/get/all",
             method: HttpRequestMethods.GET,
         },
-        getById: (id: number) => ({
-            url: `administrator/get/${id}`,
+        getById: () => ({
+            url: `administrator/get`,
             method: HttpRequestMethods.GET,
         }),
         add: {
             url: "administrator/add",
             method: HttpRequestMethods.POST,
         },
-        update: (id: number) => ({
-            url: `administrator/update/${id}`,
+        update: () => ({
+            url: `administrator/update`,
             method: HttpRequestMethods.PUT,
         }),
-        remove: (id: number) => ({
-            url: `administrator/remove/${id}`,
+        remove: () => ({
+            url: `administrator/remove/id`,
             method: HttpRequestMethods.DELETE,
         }),
     },
@@ -98,20 +98,20 @@ export const APIEndpoints: {
             url: "pharmacy/get/all",
             method: HttpRequestMethods.GET,
         },
-        getById: (id: number) => ({
-            url: `pharmacy/get/${id}`,
+        getById: () => ({
+            url: `pharmacy/get`,
             method: HttpRequestMethods.GET,
         }),
         add: {
             url: "pharmacy/add",
             method: HttpRequestMethods.POST,
         },
-        update: (id: number) => ({
-            url: `pharmacy/update/${id}`,
+        update: () => ({
+            url: `pharmacy/update`,
             method: HttpRequestMethods.PUT,
         }),
-        remove: (id: number) => ({
-            url: `pharmacy/remove/${id}`,
+        remove: () => ({
+            url: `pharmacy/remove/id`,
             method: HttpRequestMethods.DELETE,
         }),
     },
@@ -120,20 +120,20 @@ export const APIEndpoints: {
             url: "pharmacist/get/all",
             method: HttpRequestMethods.GET,
         },
-        getById: (id: number) => ({
-            url: `pharmacist/get/${id}`,
+        getById: () => ({
+            url: `pharmacist/get`,
             method: HttpRequestMethods.GET,
         }),
         add: {
             url: "pharmacist/add",
             method: HttpRequestMethods.POST,
         },
-        update: (id: number) => ({
-            url: `pharmacist/update/${id}`,
+        update: () => ({
+            url: `pharmacist/update`,
             method: HttpRequestMethods.PUT,
         }),
-        remove: (id: number) => ({
-            url: `pharmacist/remove/${id}`,
+        remove: () => ({
+            url: `pharmacist/remove/id`,
             method: HttpRequestMethods.DELETE,
         }),
     },
@@ -142,20 +142,20 @@ export const APIEndpoints: {
             url: "drug/get/all",
             method: HttpRequestMethods.GET,
         },
-        getById: (id: number) => ({
-            url: `drug/get/${id}`,
+        getById: () => ({
+            url: `drug/get`,
             method: HttpRequestMethods.GET,
         }),
         add: {
             url: "drug/add",
             method: HttpRequestMethods.POST,
         },
-        update: (id: number) => ({
-            url: `drug/update/${id}`,
+        update: () => ({
+            url: `drug/update`,
             method: HttpRequestMethods.PUT,
         }),
-        remove: (id: number) => ({
-            url: `drug/remove/${id}`,
+        remove: () => ({
+            url: `drug/remove/id`,
             method: HttpRequestMethods.DELETE,
         }),
     },
@@ -164,20 +164,20 @@ export const APIEndpoints: {
             url: "manager/get/all",
             method: HttpRequestMethods.GET,
         },
-        getById: (id: number) => ({
-            url: `manager/get/${id}`,
+        getById: () => ({
+            url: `manager/get`,
             method: HttpRequestMethods.GET,
         }),
         add: {
             url: "manager/add",
             method: HttpRequestMethods.POST,
         },
-        update: (id: number) => ({
-            url: `manager/update/${id}`,
+        update: () => ({
+            url: `manager/update`,
             method: HttpRequestMethods.PUT,
         }),
-        remove: (id: number) => ({
-            url: `manager/remove/${id}`,
+        remove: () => ({
+            url: `manager/remove/id`,
             method: HttpRequestMethods.DELETE,
         }),
     },

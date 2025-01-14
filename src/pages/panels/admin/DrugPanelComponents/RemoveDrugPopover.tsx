@@ -1,27 +1,75 @@
 import styled from "styled-components";
-import {Dropdown} from "react-bootstrap";
+import {Button} from "react-bootstrap";
+import {DrugResponse} from "../../../../values/BackendValues.tsx";
+import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
+import {useRemoveDrug} from "../../../../connection/hooks/useDrug.tsx";
 
-export const RemoveDrugPopover = () => {
+interface RemoveDrugPopoverProps {
+    onActionComplete: () => void
+    drug: DrugResponse
+}
+
+export const RemoveDrugPopover = ({onActionComplete, drug}:RemoveDrugPopoverProps) => {
+    const {hidePopover} = usePopover()
+    const {mutate: removeDrug} = useRemoveDrug()
+
+    if(!drug) {
+        hidePopover()
+        return null
+    }
+    const clickNo = () => {
+        hidePopover()
+    }
+
+    const clickYes = () => {
+        removeDrug({param: drug.id.toString()})
+        onActionComplete()
+        hidePopover()
+    }
     return (
-        /*TODO: Dodaj fetch drugów do wyboru i post z nowym orderem */
         <Content>
-            <Title>Remove Drug Order</Title>
-            <DropdownPick>
-                <Dropdown.Toggle id="dropdown-basic">
-                    Dropdown Button
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                    <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-                </Dropdown.Menu>
-            </DropdownPick>
+            <Title>Remove Drug</Title>
+                <Text>Are you sure you want to remove drug:</Text>
+                <Text>{drug.commonName}</Text>
+            <Buttons>
+                <NoButton onClick={clickNo}>No</NoButton>
+                <YesButton onClick={clickYes}>Yes</YesButton>
+            </Buttons>
         </Content>
     )
 }
-const DropdownPick = styled(Dropdown)`
-    
+const YesButton = styled(Button)`
+    font-size: 2rem;
+    padding: 0.5rem 1.5rem;
+    background-color: green;
+    border-color: green;
+    &:hover {
+        background-color: darkgreen;
+        border-color: darkgreen;
+    }
+`
+
+const NoButton = styled(Button)`
+    font-size: 2rem;
+    padding: 0.5rem 1.5rem;
+    background-color: indianred;
+    border-color: indianred;
+    &:hover {
+        background-color: red;
+        border-color: red;
+    }
+`
+
+const Buttons = styled.div`
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+`
+
+const Text = styled.div`
+    font-size: 1.5rem;
 `
 
 const Content = styled.div`
@@ -31,6 +79,7 @@ const Content = styled.div`
     align-content: center;
     align-items: center;
     justify-content: flex-start;
+    padding: 2rem;
 `
 
 const Title = styled.div`

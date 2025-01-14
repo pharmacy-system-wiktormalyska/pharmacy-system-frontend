@@ -1,249 +1,181 @@
 import styled from "styled-components";
-import {Button, Dropdown, Form} from "react-bootstrap";
-import {useEffect, useState} from "react";
-import {
-    ManagerResponse,
-    PharmacyResponse
-} from "../../../../values/BackendValues.tsx";
+import {Button, Form} from "react-bootstrap";
+import {useState} from "react";
+import {DrugResponse} from "../../../../values/BackendValues.tsx";
 import colorPalette from "../../../../values/colors.ts";
-import {useAddManager} from "../../../../connection/hooks/useManagers.tsx";
 import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
-import {useGetAllPharmacies} from "../../../../connection/hooks/usePharmacy.tsx";
-import {StyledTable2Rowed} from "../../../../components/StyledTable2Rowed.tsx";
+import {useAddDrug} from "../../../../connection/hooks/useDrug.tsx";
+import {Checkbox} from "../../../../components/Chechbox.tsx";
+import {StyledTable} from "../../../../components/StyledTable.tsx";
 
-export const AddDrugPopover = () => {
-    const [pharmacies, setPharmacies] =  useState<PharmacyResponse[]>([])
-    const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyResponse>()
-    const [selectedPharmacyName, setSelectedPharmacyName] = useState<string>("Select Pharmacy")
+interface AddDrugPopoverProps {
+    onActionComplete: () => void
+}
 
-    const [isLoading, setIsLoading] = useState(true)
-    const {data: fetchedPharmacies} = useGetAllPharmacies()
+export const AddDrugPopover = ({onActionComplete}:AddDrugPopoverProps) => {
+      const [name, setName] = useState<string | null>(null)
+    const [commonName, setCommonName] = useState<string | null>(null)
+    const [activeSubstance, setActiveSubstance] = useState<string | null>(null);
+    const [marketingAuthorizationHolder, setMarketingAuthorizationHolder] = useState<string | null>(null);
+    const [pharmaceuticalForm, setPharmaceuticalForm] = useState<string | null>(null);
+    const [maNumber, setMaNumber] = useState<string | null>(null);
+    const [atcCode, setAtcCode] = useState<string | null>(null);
+    const [strength, setStrength] = useState<string | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [active, setActive] = useState(false)
 
-    const {mutate: addManager} = useAddManager()
-
-    const [name, setName] = useState<string>('');
-    const [surname, setSurname] = useState<string>('');
-    const [familyName, setFamilyName] = useState<string>('');
-    const [placeOfBirth, setPlaceOfBirth] = useState<string>('');
-    const [dateOfBirth, setDateOfBirth] = useState<string>('');
-    const [nationality, setNationality] = useState<string>('');
-    const [address, setAddress] = useState<string>('');
-    const [correspondenceAddress, setCorrespondenceAddress] = useState<string>('');
-    const [fathersName, setFathersName] = useState<string>('');
-    const [mothersName, setMothersName] = useState<string>('');
-    const [education, setEducation] = useState<string>('');
-
+    const {mutate: addDrug, isSuccess} = useAddDrug()
     const {hidePopover} = usePopover()
-
-    useEffect(() => {
-        setPharmacies(fetchedPharmacies)
-        setIsLoading(false)
-    }, [fetchedPharmacies]);
-
-    const pickPharmacy = (pharmacy : PharmacyResponse) => {
-        setSelectedPharmacy(pharmacy)
-        setSelectedPharmacyName(pharmacy.name)
-    }
-
-    const SubmitManager = () => {
-        if (selectedPharmacy !== undefined){
-            const [month, day, year] = dateOfBirth.split("/").map(Number);
-            const date = new Date(year, month - 1, day);
-            const submitRequest: ManagerResponse = {
+    const SubmitDrug = () => {
+        if (name && commonName && activeSubstance && marketingAuthorizationHolder && pharmaceuticalForm && maNumber && atcCode && strength && imageUrl) {
+            const drug: DrugResponse = {
                 id: 0,
                 name: name,
-                surname: surname,
-                familyName: familyName,
-                placeOfBirth: placeOfBirth,
-                dateOfBirth: date,
-                nationality: nationality,
-                address: address,
-                correspondenceAddress: correspondenceAddress,
-                fathersName: fathersName,
-                mothersName: mothersName,
-                education: education,
-                pharmacyId: selectedPharmacy.id,
-
+                commonName: commonName,
+                activeSubstance: activeSubstance,
+                marketingAuthorizationHolder: marketingAuthorizationHolder,
+                pharmaceuticalForm: pharmaceuticalForm,
+                maNumber: maNumber,
+                atcCode: atcCode,
+                strength: strength,
+                relativeImageUrl: imageUrl,
+                active: active,
+                modificationDateTime: null
             }
-            addManager(submitRequest)
+            addDrug(drug)
+            if (isSuccess) alert("Successfully updated drug!")
+            onActionComplete()
             hidePopover()
         }
     }
 
-
-    const tableHead1 = () => (
+    const tableHead = () => (
         <>
-            <th>Manager Name</th>
-            <th>Manager Surname</th>
-            <th>Family Name</th>
-            <th>Place of Birth</th>
-            <th>Date of Birth</th>
-            <th>Nationality</th>
-            <th>Address</th>
-
-        </>
-    )
-
-    const tableHead2 = () => (
-        <>
-            <th>Correspondence Address</th>
-            <th>Father's Name</th>
-            <th>Mother's Name</th>
-            <th>Education</th>
-            <th>Pharmacy</th>
-            <th></th>
+            <th>Name</th>
+            <th>Common Name</th>
+            <th>Active Substance</th>
+            <th>Marketing Authorization Holder</th>
+            <th>Pharmaceutical Form</th>
+            <th>MA Number</th>
+            <th>ATC Code</th>
+            <th>Strength</th>
+            <th>Image URL</th>
+            <th>Is Active</th>
             <th></th>
         </>
-    )
+    );
 
-    const tableBody1 = () => {
-        if (isLoading) return (<tr>
-            <td>Loading...</td>
-        </tr>);
-
+    const tableBody = () =>
+    {
         return (
-            <>
-            <tr>
-                    <td>
-                        <Form.Control
-                            type="text"
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Name"
-                        />
-                    </td>
-                    <td>
-                        <Form.Control
-                            type="text"
-                            id="surname"
-                            value={surname}
-                            onChange={(e) => setSurname(e.target.value)}
-                            placeholder="Surname"
-                        />
-                    </td>
-                    <td>
-                        <Form.Control
-                            type="text"
-                            id="familyName"
-                            value={familyName}
-                            onChange={(e) => setFamilyName(e.target.value)}
-                            placeholder="Family Name"
-                        />
-                    </td>
-                    <td>
-                        <Form.Control
-                            type="text"
-                            id="placeOfBirth"
-                            value={placeOfBirth}
-                            onChange={(e) => setPlaceOfBirth(e.target.value)}
-                            placeholder="Place of Birth"
-                        />
-                    </td>
-                    <td>
-                        <Form.Control
-                            type="date"
-                            id="dateOfBirth"
-                            value={dateOfBirth}
-                            onChange={(e) => setDateOfBirth(e.target.value)}
-                        />
-                    </td>
-                    <td>
-                        <Form.Control
-                            type="text"
-                            id="nationality"
-                            value={nationality}
-                            onChange={(e) => setNationality(e.target.value)}
-                            placeholder="Nationality"
-                        />
-                    </td>
-                    <td>
-                        <Form.Control
-                            type="text"
-                            id="address"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            placeholder="Address"
-                        />
-                    </td>
+            <tr
+                key={0}
+            >
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="name"
+                        value={name || ""}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Name"
+                    />
+                </td>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="commonName"
+                        value={commonName || ""}
+                        onChange={(e) => setCommonName(e.target.value)}
+                        placeholder="Common Name"
+                    />
+                </td>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="activeSubstance"
+                        value={activeSubstance || ""}
+                        onChange={(e) => setActiveSubstance(e.target.value)}
+                        placeholder="Active Substance"
+                    />
+                </td>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="marketingAuthorizationHolder"
+                        value={marketingAuthorizationHolder || ""}
+                        onChange={(e) => setMarketingAuthorizationHolder(e.target.value)}
+                        placeholder="Marketing Authorization Holder"
+                    />
+                </td>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="pharmaceuticalForm"
+                        value={pharmaceuticalForm || ""}
+                        onChange={(e) => setPharmaceuticalForm(e.target.value)}
+                        placeholder="Pharmaceutical Form"
+                    />
+                </td>
 
-                </tr>
-            </>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="maNumber"
+                        value={maNumber || ""}
+                        onChange={(e) => setMaNumber(e.target.value)}
+                        placeholder="MA Number"
+                    />
+                </td>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="atcCode"
+                        value={atcCode || ""}
+                        onChange={(e) => setAtcCode(e.target.value)}
+                        placeholder="ATC Code"
+                    />
+                </td>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="strength"
+                        value={strength || ""}
+                        onChange={(e) => setStrength(e.target.value)}
+                        placeholder="Strength"
+                    />
+                </td>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="imageUrl"
+                        value={imageUrl || ""}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        placeholder="Image Url"
+                    />
+                </td>
+                <td>
+                    <Checkbox
+                            type={"checkbox"}
+                            id={`default-checkbox`}
+                            checked={active }
+                            onChange={(e) => setActive(e.target.checked)}
+                        />
+                </td>
+                <td>
+                    <SubmitButton onClick={SubmitDrug}>Submit</SubmitButton>
+                </td>
+            </tr>
         );
-    };
-
-    const tableBody2 = () => {
-        const safePharmacies = pharmacies || [];
-        return (
-            <>
-                <td>
-                    <Form.Control
-                        type="text"
-                        id="correspondenceAddress"
-                        value={correspondenceAddress}
-                        onChange={(e) => setCorrespondenceAddress(e.target.value)}
-                        placeholder="Correspondence Address"
-                    />
-                </td>
-                <td>
-                    <Form.Control
-                        type="text"
-                        id="fathersName"
-                        value={fathersName}
-                        onChange={(e) => setFathersName(e.target.value)}
-                        placeholder="Father's Name"
-                    />
-                </td>
-                <td>
-                    <Form.Control
-                        type="text"
-                        id="mothersName"
-                        value={mothersName}
-                        onChange={(e) => setMothersName(e.target.value)}
-                        placeholder="Mother's Name"
-                    />
-                </td>
-                <td>
-                    <Form.Control
-                        type="text"
-                        id="education"
-                        value={education}
-                        onChange={(e) => setEducation(e.target.value)}
-                        placeholder="Education"
-                    />
-                </td>
-                <td>
-                    <Dropdown drop="down">
-                        <DropdownPick id="dropdown-basic">
-                            {selectedPharmacyName}
-                        </DropdownPick>
-                        <Dropdown.Menu>
-                            {safePharmacies.map((pharmacy: PharmacyResponse) => (
-                                <Dropdown.Item key={pharmacy.id} onClick={() => pickPharmacy(pharmacy)}>
-                                    {pharmacy.name}
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </td>
-                <td>
-
-                </td>
-                <td>
-                    <SubmitButton onClick={SubmitManager}>Submit</SubmitButton>
-                </td>
-            </>
-        )
     }
 
 
     return (
         /*TODO: Dodaj fetch drugów do wyboru i post z nowym orderem */
         <Content>
-            <Title>Add Manager</Title>
-            <ManagerInfo>
-                <StyledTable2Rowed thead1={tableHead1()} tbody1={tableBody1()} thead2={tableHead2()} tbody2={tableBody2()}></StyledTable2Rowed>
-            </ManagerInfo>
+            <Title>Update Drug Order</Title>
+            <DrugInfo>
+                <StyledTable thead={tableHead()} tbody={tableBody()}></StyledTable>
+            </DrugInfo>
         </Content>
     )
 }
@@ -253,12 +185,9 @@ const SubmitButton = styled(Button)`
     background-color: ${colorPalette.header.hex};
 `
 
-const DropdownPick = styled(Dropdown.Toggle)`
-    background-color: ${colorPalette.header.hex};
-`
-const ManagerInfo = styled.div`
+const DrugInfo = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-evenly;
     align-items: flex-end;
     width: 100%;

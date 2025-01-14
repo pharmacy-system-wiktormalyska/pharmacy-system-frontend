@@ -6,22 +6,28 @@ import {
 } from "../../../../values/BackendValues.tsx";
 import {StyledTable} from "../../../../components/StyledTable.tsx";
 import colorPalette from "../../../../values/colors.ts";
-import {useAddDrug} from "../../../../connection/hooks/useDrug.tsx";
+import {useUpdateDrug} from "../../../../connection/hooks/useDrug.tsx";
 import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
-export const UpdateDrugPopover = ({drugResponse}: {drugResponse : DrugResponse}) => {
-    const [name, setName] = useState(drugResponse.name)
-    const [commonName, setCommonName] = useState(drugResponse.commonName)
-    const [activeSubstance, setActiveSubstance] = useState(drugResponse.activeSubstance);
-    const [marketingAuthorizationHolder, setMarketingAuthorizationHolder] = useState(drugResponse.marketingAuthorizationHolder);
-    const [pharmaceuticalForm, setPharmaceuticalForm] = useState(drugResponse.pharmaceuticalForm);
-    const [maNumber, setMaNumber] = useState(drugResponse.maNumber);
-    const [atcCode, setAtcCode] = useState(drugResponse.atcCode);
-    const [strength, setStrength] = useState(drugResponse.strength);
-    const [imageUrl, setImageUrl] = useState(drugResponse.relativeImageUrl);
+import {Checkbox} from "../../../../components/Chechbox.tsx";
 
-    const {mutate: addDrug} = useAddDrug()
+interface UpdateDrugPopoverProps {
+    onActionComplete: () => void
+    drugResponse: DrugResponse
+}
+export const UpdateDrugPopover = ({drugResponse,onActionComplete}:UpdateDrugPopoverProps) => {
+    const [name, setName] = useState(drugResponse.name || "")
+    const [commonName, setCommonName] = useState(drugResponse.commonName || "")
+    const [activeSubstance, setActiveSubstance] = useState(drugResponse.activeSubstance || "");
+    const [marketingAuthorizationHolder, setMarketingAuthorizationHolder] = useState(drugResponse.marketingAuthorizationHolder || "");
+    const [pharmaceuticalForm, setPharmaceuticalForm] = useState(drugResponse.pharmaceuticalForm || "");
+    const [maNumber, setMaNumber] = useState(drugResponse.maNumber || "");
+    const [atcCode, setAtcCode] = useState(drugResponse.atcCode || "");
+    const [strength, setStrength] = useState(drugResponse.strength || "");
+    const [imageUrl, setImageUrl] = useState(drugResponse.relativeImageUrl || "");
+    const [active, setActive] = useState(drugResponse.active || false)
+
+    const {mutate: updateDrug, isSuccess} = useUpdateDrug()
     const {hidePopover} = usePopover()
-//TODO: zobaczyć czy działa
     const SubmitDrug = () => {
         const drug: DrugResponse = {
             id: drugResponse.id,
@@ -33,9 +39,13 @@ export const UpdateDrugPopover = ({drugResponse}: {drugResponse : DrugResponse})
             maNumber: maNumber,
             atcCode: atcCode,
             strength: strength,
-            relativeImageUrl: imageUrl
+            relativeImageUrl: imageUrl,
+            active: active,
+            modificationDateTime: new Date()
         }
-        addDrug(drug)
+        updateDrug(drug)
+        if (isSuccess) alert("Successfully updated drug!")
+        onActionComplete()
         hidePopover()
     }
 
@@ -51,6 +61,7 @@ export const UpdateDrugPopover = ({drugResponse}: {drugResponse : DrugResponse})
             <th>ATC Code</th>
             <th>Strength</th>
             <th>Image URL</th>
+            <th>Is Active</th>
             <th></th>
         </>
     );
@@ -144,6 +155,14 @@ export const UpdateDrugPopover = ({drugResponse}: {drugResponse : DrugResponse})
                         onChange={(e) => setImageUrl(e.target.value)}
                         placeholder="Image Url"
                     />
+                </td>
+                <td>
+                    <Checkbox
+                            type={"checkbox"}
+                            id={`default-checkbox`}
+                            checked={active}
+                            onChange={(e) => setActive(e.target.checked)}
+                        />
                 </td>
                 <td>
                     <SubmitButton onClick={SubmitDrug}>Submit</SubmitButton>
