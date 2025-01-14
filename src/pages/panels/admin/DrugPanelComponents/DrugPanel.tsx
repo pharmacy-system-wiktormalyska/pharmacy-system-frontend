@@ -10,7 +10,7 @@ import {UpdateDrugPopover} from "./UpdateDrugPopover.tsx";
 import {useGetAllDrugs} from "../../../../connection/hooks/useDrug.tsx";
 import {RemoveDrugPopover} from "./RemoveDrugPopover.tsx";
 import {Checkbox} from "../../../../components/Chechbox.tsx";
-//TODO: Implement All
+
 export const DrugPanel = () => {
     const [drugs, setDrugs] = useState<DrugResponse[] | null>([]);
     const {showPopover} = usePopover()
@@ -114,7 +114,6 @@ export const DrugPanel = () => {
         </BasePanel>
     );
 };
-//TODO: Fix React does not recognize the `isSelected` prop on a DOM element.
 const TableRow = styled.tr.withConfig({
     shouldForwardProp: (prop) => prop !== 'isSelected',
 })<{ isSelected: boolean }>`

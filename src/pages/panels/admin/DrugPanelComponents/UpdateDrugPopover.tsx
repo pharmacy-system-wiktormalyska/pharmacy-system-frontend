@@ -26,7 +26,7 @@ export const UpdateDrugPopover = ({drugResponse,onActionComplete}:UpdateDrugPopo
     const [imageUrl, setImageUrl] = useState(drugResponse.relativeImageUrl || "");
     const [active, setActive] = useState(drugResponse.active || false)
 
-    const {mutate: updateDrug, isSuccess} = useUpdateDrug()
+    const {mutate: updateDrug} = useUpdateDrug()
     const {hidePopover} = usePopover()
     const SubmitDrug = () => {
         const drug: DrugResponse = {
@@ -44,7 +44,6 @@ export const UpdateDrugPopover = ({drugResponse,onActionComplete}:UpdateDrugPopo
             modificationDateTime: new Date()
         }
         updateDrug(drug)
-        if (isSuccess) alert("Successfully updated drug!")
         onActionComplete()
         hidePopover()
     }

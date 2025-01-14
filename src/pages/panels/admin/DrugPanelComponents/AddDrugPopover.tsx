@@ -13,7 +13,7 @@ interface AddDrugPopoverProps {
 }
 
 export const AddDrugPopover = ({onActionComplete}:AddDrugPopoverProps) => {
-      const [name, setName] = useState<string | null>(null)
+    const [name, setName] = useState<string | null>(null)
     const [commonName, setCommonName] = useState<string | null>(null)
     const [activeSubstance, setActiveSubstance] = useState<string | null>(null);
     const [marketingAuthorizationHolder, setMarketingAuthorizationHolder] = useState<string | null>(null);
@@ -170,7 +170,6 @@ export const AddDrugPopover = ({onActionComplete}:AddDrugPopoverProps) => {
 
 
     return (
-        /*TODO: Dodaj fetch drugów do wyboru i post z nowym orderem */
         <Content>
             <Title>Update Drug Order</Title>
             <DrugInfo>
