@@ -80,7 +80,7 @@ export interface PharmacyResponse {
     pharmacyId: number;
     name: string;
     address: string;
-    type: 'APTEKA_OGOLNODOSTEPNA';
+    type: string;
     owner: string;
     phone: string;
     email: string;

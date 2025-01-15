@@ -3,96 +3,90 @@ import styled from "styled-components";
 import colorPalette from "../../../../values/colors.ts";
 import {useEffect, useState} from "react";
 import {StyledTable} from "../../../../components/StyledTable.tsx";
-import {ManagerResponse} from "../../../../values/BackendValues.tsx";
+import {PharmacyResponse} from "../../../../values/BackendValues.tsx";
 import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
 import {AddPharmacyPopover} from "./AddPharmacyPopover.tsx";
 import {UpdatePharmacyPopover} from "./UpdatePharmacyPopover.tsx";
 import {RemovePharmacyPopover} from "./RemovePharmacyPopover.tsx";
-import { format } from 'date-fns';
-import {useGetAllManagers} from "../../../../connection/hooks/useManagers.tsx";
-//TODO: Implement All
+import {useGetAllPharmacies} from "../../../../connection/hooks/usePharmacy.tsx";
+
 export const PharmacyPanel = () => {
-    const [managers, setManagers] = useState<ManagerResponse[] | null>([]);
+    const [pharmacies, setPharmacies] = useState<PharmacyResponse[] | null>([]);
     const {showPopover} = usePopover()
 
-    const [selectedRow, setSelectedRow] = useState<ManagerResponse | null>(null)
+    const [selectedRow, setSelectedRow] = useState<PharmacyResponse | null>(null)
 
-    const {data: allManagers} = useGetAllManagers()
+    const {data: allPharmacies, refetch} = useGetAllPharmacies()
 
     useEffect(() => {
-        setManagers(allManagers)
-        console.log(allManagers)
-    }, [allManagers]);
+        setPharmacies(allPharmacies)
+    }, [allPharmacies]);
 
+    const refreshData = () => {
+        setTimeout(() => {
+            refetch().then(() => {});
+        }, 1000);
+    }
 
     const showAddPopover = () => {
-        showPopover(<AddPharmacyPopover/>)
+        showPopover(<AddPharmacyPopover onActionComplete={refreshData}/>)
         setSelectedRow(null)
     }
 
     const showUpdatePopover = () => {
         if (selectedRow !== null) {
-            showPopover(<UpdatePharmacyPopover managerResponse={selectedRow}/>)
-            setSelectedRow(null)
-        }
-    }
-    const showRemovePopover = () => {
-        if (selectedRow !== null) {
-            showPopover(RemovePharmacyPopover())
+            showPopover(<UpdatePharmacyPopover pharmacyResponse={selectedRow} onActionComplete={refreshData}/>)
             setSelectedRow(null)
         }
     }
 
-    const handleRowClick = (order: ManagerResponse) => {
-        setSelectedRow(order)
+    const showRemovePopover = () => {
+        if (selectedRow !== null) {
+            showPopover(<RemovePharmacyPopover pharmacy={selectedRow} onActionComplete={refreshData}/>)
+            setSelectedRow(null)
+        }
+    }
+
+    const handleRowClick = (pharmacy: PharmacyResponse) => {
+        setSelectedRow(pharmacy)
     };
 
     const tableHead = () => (
         <>
-            <th>Manager ID</th>
+            <th>ID</th>
             <th>Name</th>
-            <th>Surname</th>
-            <th>Family Name</th>
-            <th>Place of Birth</th>
-            <th>Nationality</th>
             <th>Address</th>
-            <th>Correspondence Address</th>
-            <th>Fathers Name</th>
-            <th>Mothers Name</th>
-            <th>Education</th>
-            <th>Pharmacy ID</th>
+            <th>Type</th>
+            <th>Owner</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Website</th>
         </>
     );
 
     const tableBody = () => (
         <>
-
-            {managers?.map((manager) => (
+            {pharmacies?.map((pharmacy) => (
                 <TableRow
-                    key={manager.id}
-                    onClick={() => handleRowClick(manager)}
-                    isSelected={selectedRow !== null && selectedRow.id === manager.id}
+                    key={pharmacy.id}
+                    onClick={() => handleRowClick(pharmacy)}
+                    isSelected={selectedRow !== null && selectedRow.id === pharmacy.id}
                 >
-                    <td>{manager.id}</td>
-                    <td>{manager.name}</td>
-                    <td>{manager.surname}</td>
-                    <td>{manager.familyName}</td>
-                    <td>{manager.placeOfBirth}</td>
-                    <td>{format(manager.dateOfBirth, 'yyyy/MM/dd')}</td>
-                    <td>{manager.nationality}</td>
-                    <td>{manager.address}</td>
-                    <td>{manager.correspondenceAddress}</td>
-                    <td>{manager.fathersName}</td>
-                    <td>{manager.mothersName}</td>
-                    <td>{manager.education}</td>
-                    <td>{manager.pharmacyId}</td>
+                    <td>{pharmacy.id}</td>
+                    <td>{pharmacy.name}</td>
+                    <td>{pharmacy.address}</td>
+                    <td>{pharmacy.type}</td>
+                    <td>{pharmacy.owner}</td>
+                    <td>{pharmacy.phone}</td>
+                    <td>{pharmacy.email}</td>
+                    <td>{pharmacy.website}</td>
                 </TableRow>
             ))}
         </>
     );
 
     return (
-        <BasePanel title="Admin Manager Panel">
+        <BasePanel title="Admin Pharmacy Panel">
             <Body>
                 <Options>
                     <Option onClick={() => {showAddPopover()}}>Add</Option>
@@ -105,8 +99,10 @@ export const PharmacyPanel = () => {
         </BasePanel>
     );
 };
-//TODO: Fix React does not recognize the `isSelected` prop on a DOM element.
-const TableRow = styled.tr<{ isSelected: boolean }>`
+
+const TableRow = styled.tr.withConfig({
+    shouldForwardProp: (prop) => prop !== 'isSelected',
+})<{ isSelected: boolean }>`
     background-color: ${({ isSelected }) =>
             isSelected ? "rgba(0,0,0,0.3)" : "transparent"};
     cursor: pointer;
@@ -115,6 +111,7 @@ const TableRow = styled.tr<{ isSelected: boolean }>`
         background-color: rgba(0, 0, 0, 0.2);
     }
 `;
+
 const Body = styled.div`
     width: 100%;
     height: 100%;
