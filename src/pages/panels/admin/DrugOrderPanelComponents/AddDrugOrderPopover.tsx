@@ -60,7 +60,6 @@ export const AddDrugOrderPopover = () => {
                 quantity: amount,
                 modificationDateTime: new Date(),
                 warehouseId: 0,
-                isActive: true,
                 completionDateTime: null
             }
             addDrugOrder(submitRequest)

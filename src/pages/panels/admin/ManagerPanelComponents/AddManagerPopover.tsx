@@ -13,7 +13,7 @@ import {StyledTable2Rowed} from "../../../../components/StyledTable2Rowed.tsx";
 
 export const AddManagerPopover = () => {
     const [pharmacies, setPharmacies] =  useState<PharmacyResponse[]>([])
-    const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyResponse>()
+    const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyResponse | null>(null)
     const [selectedPharmacyName, setSelectedPharmacyName] = useState<string>("Select Pharmacy")
 
     const [isLoading, setIsLoading] = useState(true)
@@ -44,9 +44,8 @@ export const AddManagerPopover = () => {
         setSelectedPharmacy(pharmacy)
         setSelectedPharmacyName(pharmacy.name)
     }
-
+    //TODO: fix post
     const SubmitManager = () => {
-        if (selectedPharmacy !== undefined){
             const [month, day, year] = dateOfBirth.split("/").map(Number);
             const date = new Date(year, month - 1, day);
             const submitRequest: ManagerResponse = {
@@ -62,12 +61,11 @@ export const AddManagerPopover = () => {
                 fathersName: fathersName,
                 mothersName: mothersName,
                 education: education,
-                pharmacyId: selectedPharmacy.id,
-
+                pharmacyId: selectedPharmacy ? selectedPharmacy.id : 0
             }
             addManager(submitRequest)
+            console.log(submitRequest)
             hidePopover()
-        }
     }
 
 
@@ -166,7 +164,6 @@ export const AddManagerPopover = () => {
                             placeholder="Address"
                         />
                     </td>
-
                 </tr>
             </>
         );
