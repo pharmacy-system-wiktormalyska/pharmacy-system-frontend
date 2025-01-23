@@ -2,7 +2,7 @@ export const url = "https://backend.pharmacy.wiktormalyska.ovh/";
 
 // export const url = "http://localhost:8080";
 export interface DrugOrderResponse {
-    id: number
+    id?: number|null;
     warehouseId: number
     drugId: number
     quantity: number
@@ -34,7 +34,7 @@ export enum PharmacyType {
 }
 
 export interface DrugResponse {
-    id: number;
+    id?: number|null;
     name: string;
     commonName: string;
     activeSubstance: string;
@@ -132,4 +132,19 @@ export interface AdministratorResponse {
     password: string;
     isActive: boolean;
     role: string;
+}
+
+export interface WarehouseResponse {
+    id: number;
+    stock: WarehouseItemResponse[];
+    managerId: number;
+    pharmacyIds: number[];
+    drugOrderIds: number[];
+}
+export interface WarehouseItemResponse {
+    id: number;
+    warehouseId: number;
+    drugId: number;
+    priceInCents: number;
+    quantity: number;
 }

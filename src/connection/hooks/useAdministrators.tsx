@@ -7,7 +7,7 @@ export const useGetAllAdministrators = () => {
 };
 
 export const useGetAdministratorById = () => {
-    const getById = APIEndpoints.administrator.getById();
+    const getById = APIEndpoints.administrator.getById;
     return usePathParamsToBackend(`administrator`, getById.url, getById.method);
 };
 
@@ -17,11 +17,11 @@ export const useAddAdministrator = () => {
 };
 
 export const useUpdateAdministrator = () => {
-    const update = APIEndpoints.administrator.update();
+    const update = APIEndpoints.administrator.update;
     return useMutateToBackend(`administrator-update-`, update.url, update.method);
 };
 
 export const useRemoveAdministrator = () => {
-    const remove = APIEndpoints.administrator.remove();
+    const remove = APIEndpoints.administrator.remove;
     return usePathParamsToBackend(`administrator-remove`, remove.url, remove.method);
 };

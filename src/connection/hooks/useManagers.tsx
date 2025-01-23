@@ -7,7 +7,7 @@ export const useGetAllManagers = () => {
 };
 
 export const useGetManagerById = () => {
-    const getById = APIEndpoints.manager.getById();
+    const getById = APIEndpoints.manager.getById;
     return usePathParamsToBackend(`manager`, getById.url, getById.method);
 };
 
@@ -17,11 +17,11 @@ export const useAddManager = () => {
 };
 
 export const useUpdateManager = () => {
-    const update = APIEndpoints.manager.update();
+    const update = APIEndpoints.manager.update;
     return useMutateToBackend(`manager-update`, update.url, update.method);
 };
 
 export const useRemoveManager = () => {
-    const remove = APIEndpoints.manager.remove();
+    const remove = APIEndpoints.manager.remove;
     return usePathParamsToBackend(`manager-remove`, remove.url, remove.method);
 };

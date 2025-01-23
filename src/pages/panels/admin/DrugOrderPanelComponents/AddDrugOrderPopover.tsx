@@ -52,10 +52,10 @@ export const AddDrugOrderPopover = () => {
         if (selectedDrug !== undefined && selectedManager !== undefined ){
             const submitRequest: DrugOrderResponse = {
                 id: 0,
-                drugId: selectedDrug.id,
+                drugId: selectedDrug.id || 0,
                 creationDateTime: new Date(),
                 orderStatus: OrderStatus.PENDING,
-                managerId: selectedManager.id,
+                managerId: selectedManager.id || 0,
                 pharmacistId: storedDecodedToken?.user_id || 0,
                 quantity: amount,
                 modificationDateTime: new Date(),

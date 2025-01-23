@@ -46,18 +46,33 @@ export const usePathParamsToBackend = (key: string, endpoint: string, method: Ht
     });
 };
 
-const fetchData = async (endpoint: string, method: HttpRequestMethods, token?: string, body?:object) => {
-    const response = await fetch(url+endpoint, {
+const fetchData = async (endpoint: string, method: HttpRequestMethods, token?: string, body?: object) => {
+    const response = await fetch(url + endpoint, {
         method: method,
         headers: {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: "include",
-        body: body? JSON.stringify(body) : null
+        body: body ? JSON.stringify(body) : null,
     });
+
     if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Network response was not ok: ${response.statusText}`);
     }
-    return response.json();
+    if (response.status === 204 || response.status === 202) {
+        return null;
+    }
+    const contentType = response.headers.get("Content-Type");
+    if (contentType && contentType.includes("application/json")) {
+        try {
+            return await response.json();
+        } catch (error) {
+            console.error("Failed to parse JSON:", await response.text(), error);
+            throw new Error('Failed to parse JSON from response');
+        }
+    }
+    const responseText = await response.text();
+    console.warn("Non-JSON response received:", responseText);
+    return responseText;
 };
