@@ -60,7 +60,6 @@ export const UpdateDrugPopover = ({drugResponse,onActionComplete}:UpdateDrugPopo
             <th>ATC Code</th>
             <th>Strength</th>
             <th>Image URL</th>
-            <th>Is Active</th>
             <th></th>
         </>
     );

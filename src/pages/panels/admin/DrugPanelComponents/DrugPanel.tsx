@@ -9,7 +9,6 @@ import {AddDrugPopover} from "./AddDrugPopover.tsx";
 import {UpdateDrugPopover} from "./UpdateDrugPopover.tsx";
 import {useGetAllDrugs} from "../../../../connection/hooks/useDrug.tsx";
 import {RemoveDrugPopover} from "./RemoveDrugPopover.tsx";
-import {Checkbox} from "../../../../components/Chechbox.tsx";
 
 export const DrugPanel = () => {
     const [drugs, setDrugs] = useState<DrugResponse[] | null>([]);
@@ -63,7 +62,6 @@ export const DrugPanel = () => {
             <th>ATC Code</th>
             <th>Strength</th>
             <th>Image URL</th>
-            <th>Is Active</th>
         </>
     );
 
@@ -87,14 +85,6 @@ export const DrugPanel = () => {
                     <td>{drug.atcCode}</td>
                     <td>{drug.strength}</td>
                     <td>{drug.relativeImageUrl}</td>
-                    <td>
-                        <Checkbox
-                            type={"checkbox"}
-                            id={`default-checkbox`}
-                            checked={drug.active}
-                            readOnly={true.valueOf()}
-                        />
-                    </td>
                 </TableRow>
             )})}
         </>

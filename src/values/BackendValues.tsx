@@ -12,7 +12,7 @@ export interface DrugOrderResponse {
     creationDateTime: Date
     modificationDateTime: Date
     completionDateTime: Date | null
-    isActive: boolean | null
+
 }
 export enum OrderStatus {
     PENDING,
