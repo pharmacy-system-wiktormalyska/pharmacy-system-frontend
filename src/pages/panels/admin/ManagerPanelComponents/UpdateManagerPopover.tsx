@@ -1,222 +1,266 @@
 import styled from "styled-components";
-import {Button, Dropdown, Form} from "react-bootstrap";
+import {Button, Form} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {
-    DrugOrderResponse,
-    DrugResponse,
     ManagerResponse,
-    OrderStatus,
-    PharmacistResponse
 } from "../../../../values/BackendValues.tsx";
-import NumberInputWithArrows from "../../../../components/NumberInputWithArrows.tsx";
-import {StyledTable} from "../../../../components/StyledTable.tsx";
 import colorPalette from "../../../../values/colors.ts";
-import {format} from "date-fns";
-import {useGetAllDrugs} from "../../../../connection/hooks/useDrug.tsx";
-import {useGetAllManagers} from "../../../../connection/hooks/useManagers.tsx";
-import {useGetAllPharmacists} from "../../../../connection/hooks/usePharmacist.tsx";
+import {useUpdateManager} from "../../../../connection/hooks/useManagers.tsx";
+import {useGetAllPharmacies} from "../../../../connection/hooks/usePharmacy.tsx";
+import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
+import {StyledTable2Rowed} from "../../../../components/StyledTable2Rowed.tsx";
 
-export const UpdateManagerPopover = ({managerResponse}: {managerResponse : ManagerResponse}) => {
-    const [drugs, setDrugs] =  useState<ManagerResponse[]>([])
-    //TODO: Get drugOrderResponse by id
-    const [selectedDrug, setSelectedDrug] = useState<DrugResponse>()
-    const [selectedDrugCommonName, setSelectedDrugCommonName] = useState<string>("Select Drug")
+interface UpdateManagerPopoverProps {
+    onActionComplete: () => void
+    managerResponse : ManagerResponse
+}
+//TODO: Test czy działa
+export const UpdateManagerPopover = ({managerResponse, onActionComplete}: UpdateManagerPopoverProps) => {
+    const [isLoading, setIsLoading] = useState(true)
+    const {data: fetchedPharmacies} = useGetAllPharmacies()
+    const {mutate: updateManager} = useUpdateManager()
 
-    const [managers, setManagers] =  useState<ManagerResponse[]>([])
-    const [selectedManager, setSelectedManager] = useState<ManagerResponse>()
-    const [selectedManagerName, setSelectedManagerName] = useState<string>("None")
+    const [name, setName] = useState<string>(managerResponse.name);
+    const [username, setUsername] = useState<string>(managerResponse.username);
+    const [surname, setSurname] = useState<string>(managerResponse.surname);
+    const [pesel, setPesel] = useState<string>(managerResponse.pesel);
+    const [familyName, setFamilyName] = useState<string>(managerResponse.familyName);
+    const [placeOfBirth, setPlaceOfBirth] = useState<string>(managerResponse.placeOfBirth);
+    const [dateOfBirth, setDateOfBirth] = useState<Date | null>(
+        managerResponse.dateOfBirth ? new Date(managerResponse.dateOfBirth) : null
+    );
+    const [nationality, setNationality] = useState<string>(managerResponse.nationality);
+    const [address, setAddress] = useState<string>(managerResponse.address);
+    const [correspondenceAddress, setCorrespondenceAddress] = useState<string>(managerResponse.correspondenceAddress);
+    const [fathersName, setFathersName] = useState<string>(managerResponse.fathersName);
+    const [mothersName, setMothersName] = useState<string>(managerResponse.mothersName);
+    const [education, setEducation] = useState<string>(managerResponse.education);
 
-    const [pharmacists, setPharmacists] =  useState<PharmacistResponse[]>([])
-    const [selectedPharmacist, setSelectedPharmacist] = useState<PharmacistResponse>()
-    const [selectedPharmacistName, setSelectedPharmacistName] = useState<string>("None")
+    const {hidePopover} = usePopover()
 
-    const [amount, setAmount] = useState(1);
-
-    const [selectedOrderStatus, setSelectedOrderStatus] = useState<string>(OrderStatus[drugOrderResponse.orderStatus])
-    const [isActive, setIsActive] = useState<boolean>(drugOrderResponse.isActive)
-
-    const {data: fetchedDrugs} = useGetAllDrugs()
-    const {data: fetchedManagers} = useGetAllManagers()
-    const {data: fetchedPharmacist} = useGetAllPharmacists()
-    
     useEffect(() => {
-        setDrugs(fetchedDrugs)
-        setManagers(fetchedManagers)
-        setPharmacists(fetchedPharmacist)
-    }, [fetchedDrugs, fetchedManagers, fetchedPharmacist]);
+        setIsLoading(false)
+    }, [fetchedPharmacies]);
 
-    const pickDrug = (drug : DrugResponse) => {
-        setSelectedDrug(drug)
-        setSelectedDrugCommonName(drug.commonName)
+    const SubmitManager = () => {
+        if (!dateOfBirth) {
+            console.error("Date of birth is required");
+            return;
+        }
+        const submitRequest:ManagerResponse = {
+            id: managerResponse.id,
+            name: name,
+            username: username,
+            surname: surname,
+            pesel: pesel,
+            familyName: familyName,
+            placeOfBirth: placeOfBirth,
+            dateOfBirth: dateOfBirth,
+            nationality: nationality,
+            address: address,
+            correspondenceAddress: correspondenceAddress,
+            fathersName: fathersName,
+            mothersName: mothersName,
+            education: education
+        }
+        console.log(submitRequest)
+        updateManager(submitRequest)
+        onActionComplete()
+        hidePopover()
     }
 
-    const pickPharmacist = (pharmacist : PharmacistResponse) => {
-        setSelectedPharmacist(pharmacist)
-        setSelectedPharmacistName(pharmacist.name)
-    }
 
-    const pickManager = (manager : ManagerResponse) => {
-        setSelectedManager(manager)
-        setSelectedManagerName(manager.name + " " + manager.familyName)
-    }
-
-
-    const SubmitDrugOrder = () => {
-        //TODO: Add Submit logic
-    }
-
-    const handleOrderStatusClick = (orderStatus: string) => {
-        setSelectedOrderStatus(orderStatus)
-    }
-
-    const tableHead = () => (
+    const tableHead1 = () => (
         <>
-            <th>Order ID</th>
-            <th>Drug ID</th>
-            <th>Quantity</th>
-            <th>Pharmacist ID</th>
-            <th>Manager ID</th>
-            <th>Order Status</th>
-            <th>Creation Date Time</th>
-            <th>Modification Date Time</th>
-            <th>Is Active</th>
+            <th>Manager Name</th>
+            <th>Username</th>
+            <th>Manager Surname</th>
+            <th>Pesel</th>
+            <th>Family Name</th>
+            <th>Place of Birth</th>
+            <th>Date of Birth</th>
+
+        </>
+    )
+
+    const tableHead2 = () => (
+        <>
+            <th>Nationality</th>
+            <th>Address</th>
+            <th>Correspondence Address</th>
+            <th>Father's Name</th>
+            <th>Mother's Name</th>
+            <th>Education</th>
             <th></th>
         </>
-    );
+    )
 
-    const tableBody = () =>
-    {
-        const handleAmountChange = (newAmount: number) => {
-            setAmount(newAmount);
-        };
+    const tableBody1 = () => {
+        if (isLoading) return (
+            <>
+                <tr>
+                    <td>Loading...</td>
+                </tr>
+            </>
+        );
 
-        const handleActiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setIsActive(e.target.checked);
-        }
-
-        //TODO: Replace id with name from backend
-        if (drugOrderResponse === null) return null
         return (
             <>
-                <tr
-                    key={drugOrderResponse.id}
-                >
-                    <td>{drugOrderResponse.id}</td>
+                <tr>
                     <td>
-                        <Dropdown drop={"down"}>
-                            <DropdownPick id="dropdown-basic">
-                                {selectedDrugCommonName}
-                            </DropdownPick>
-
-                            <Dropdown.Menu>
-                                {drugs.map((drug: DrugResponse) => (
-                                    <Dropdown.Item key={drug.id} onClick={() => pickDrug(drug)}>
-                                        {drug.commonName}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </td>
-                    <td>
-                        <NumberInputWithArrows max={99} base_amount={drugOrderResponse.quantity} onValueChange={handleAmountChange}/>
-                    </td>
-                    <td>
-                        <Dropdown drop={"down"}>
-                            <DropdownPick id="dropdown-basic">
-                                {selectedPharmacistName}
-                            </DropdownPick>
-
-                            <Dropdown.Menu>
-                                {pharmacists.map((pharmacist: PharmacistResponse) => (
-                                    <Dropdown.Item key={pharmacist.id} onClick={() => pickPharmacist(pharmacist)}>
-                                        {pharmacist.name}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </td>
-                    <td>
-                        <Dropdown drop={"down"}>
-                            <DropdownPick id="dropdown-basic">
-                                {selectedManagerName}
-                            </DropdownPick>
-
-                            <Dropdown.Menu>
-                                {managers.map((manager: ManagerResponse) => (
-                                    <Dropdown.Item key={manager.id} onClick={() => pickManager(manager)}>
-                                        {manager.name + " " + manager.familyName}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </td>
-
-                    <td>
-                        <Dropdown drop={"down"}>
-                            <DropdownPick id="dropdown-basic">
-                                {selectedOrderStatus}
-                            </DropdownPick>
-
-                            <Dropdown.Menu>
-                                {Object.keys(OrderStatus)
-                                    .filter((key) => isNaN(Number(key)))
-                                    .map((orderStatus) => (
-                                        <Dropdown.Item
-                                            key={orderStatus}
-                                            onClick={() => handleOrderStatusClick(orderStatus)}
-                                        >
-                                            {orderStatus}
-                                        </Dropdown.Item>
-                                    ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </td>
-                    <td>{format(drugOrderResponse.creationDateTime, 'yyyy/MM/dd')}</td>
-                    <td>{format(drugOrderResponse.modificationDateTime, 'yyyy/MM/dd')}</td>
-                    <td>
-                        <Checkbox
-                            type={"checkbox"}
-                            id={`default-checkbox`}
-                            checked={isActive}
-                            onChange={handleActiveChange}
+                        <Form.Control
+                            type="text"
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Name"
                         />
                     </td>
                     <td>
-                        <SubmitButton onClick={SubmitDrugOrder}>Submit</SubmitButton>
+                        <Form.Control
+                            type="text"
+                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Username"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="surname"
+                            value={surname}
+                            onChange={(e) => setSurname(e.target.value)}
+                            placeholder="Surname"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="pesel"
+                            value={pesel}
+                            onChange={(e) => setPesel(e.target.value)}
+                            placeholder="Pesel"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="familyName"
+                            value={familyName}
+                            onChange={(e) => setFamilyName(e.target.value)}
+                            placeholder="Family Name"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="placeOfBirth"
+                            value={placeOfBirth}
+                            onChange={(e) => setPlaceOfBirth(e.target.value)}
+                            placeholder="Place of Birth"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="date"
+                            id="dateOfBirth"
+                            value={dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : ""}
+                            onChange={(e) => {
+                                const inputDate = e.target.value; // YYYY-MM-DD format
+                                setDateOfBirth(inputDate ? new Date(inputDate) : null);
+                            }}
+                        />
                     </td>
                 </tr>
             </>
         );
+    };
+
+    const tableBody2 = () => {
+        return (
+            <>
+                <tr>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="nationality"
+                            value={nationality}
+                            onChange={(e) => setNationality(e.target.value)}
+                            placeholder="Nationality"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="address"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            placeholder="Address"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="correspondenceAddress"
+                            value={correspondenceAddress}
+                            onChange={(e) => setCorrespondenceAddress(e.target.value)}
+                            placeholder="Correspondence Address"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="fathersName"
+                            value={fathersName}
+                            onChange={(e) => setFathersName(e.target.value)}
+                            placeholder="Father's Name"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="mothersName"
+                            value={mothersName}
+                            onChange={(e) => setMothersName(e.target.value)}
+                            placeholder="Mother's Name"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="education"
+                            value={education}
+                            onChange={(e) => setEducation(e.target.value)}
+                            placeholder="Education"
+                        />
+                    </td>
+                    <td>
+                        <SubmitButton onClick={SubmitManager}>Submit</SubmitButton>
+                    </td>
+                </tr>
+            </>
+        )
     }
 
 
     return (
-        /*TODO: Dodaj fetch drugów do wyboru i post z nowym orderem */
         <Content>
-            <Title>Update Drug Order</Title>
-            <DrugOrderInfo>
-                <StyledTable thead={tableHead()} tbody={tableBody()}></StyledTable>
-            </DrugOrderInfo>
+            <Title>Add Manager</Title>
+            <ManagerInfo>
+                <StyledTable2Rowed thead1={tableHead1()} tbody1={tableBody1()} thead2={tableHead2()}
+                                   tbody2={tableBody2()}></StyledTable2Rowed>
+            </ManagerInfo>
         </Content>
     )
 }
-const Checkbox = styled(Form.Check)`
-    input {
-        background-color: ${colorPalette.header.hex};
-    }
-    
-`
-
 const SubmitButton = styled(Button)`
     background-color: ${colorPalette.header.hex};
 `
 
-const DropdownPick = styled(Dropdown.Toggle)`
-    background-color: ${colorPalette.header.hex};
-`
-const DrugOrderInfo = styled.div`
+const ManagerInfo = styled.div`
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-evenly;
     align-items: flex-end;
     width: 100%;

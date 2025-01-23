@@ -1,31 +1,30 @@
 import styled from "styled-components";
-import {Button, Dropdown, Form} from "react-bootstrap";
+import {Button, Form} from "react-bootstrap";
 import {useEffect, useState} from "react";
-import {
-    ManagerResponse,
-    PharmacyResponse
-} from "../../../../values/BackendValues.tsx";
 import colorPalette from "../../../../values/colors.ts";
 import {useAddManager} from "../../../../connection/hooks/useManagers.tsx";
 import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
 import {useGetAllPharmacies} from "../../../../connection/hooks/usePharmacy.tsx";
 import {StyledTable2Rowed} from "../../../../components/StyledTable2Rowed.tsx";
+import {ManagerResponse} from "../../../../values/BackendValues.tsx";
 
-export const AddManagerPopover = () => {
-    const [pharmacies, setPharmacies] =  useState<PharmacyResponse[]>([])
-    const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyResponse | null>(null)
-    const [selectedPharmacyName, setSelectedPharmacyName] = useState<string>("Select Pharmacy")
+interface AddManagerPopoverProps {
+    onActionComplete: () => void
+}
 
+export const AddManagerPopover = ({onActionComplete}:AddManagerPopoverProps) => {
     const [isLoading, setIsLoading] = useState(true)
     const {data: fetchedPharmacies} = useGetAllPharmacies()
 
     const {mutate: addManager} = useAddManager()
 
     const [name, setName] = useState<string>('');
+    const [username, setUsername] = useState<string>('');
     const [surname, setSurname] = useState<string>('');
+    const [pesel, setPesel] = useState<string>('');
     const [familyName, setFamilyName] = useState<string>('');
     const [placeOfBirth, setPlaceOfBirth] = useState<string>('');
-    const [dateOfBirth, setDateOfBirth] = useState<string>('');
+    const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
     const [nationality, setNationality] = useState<string>('');
     const [address, setAddress] = useState<string>('');
     const [correspondenceAddress, setCorrespondenceAddress] = useState<string>('');
@@ -36,72 +35,72 @@ export const AddManagerPopover = () => {
     const {hidePopover} = usePopover()
 
     useEffect(() => {
-        setPharmacies(fetchedPharmacies)
         setIsLoading(false)
     }, [fetchedPharmacies]);
 
-    const pickPharmacy = (pharmacy : PharmacyResponse) => {
-        setSelectedPharmacy(pharmacy)
-        setSelectedPharmacyName(pharmacy.name)
-    }
-    //TODO: fix post
     const SubmitManager = () => {
-            const [month, day, year] = dateOfBirth.split("/").map(Number);
-            const date = new Date(year, month - 1, day);
-            const submitRequest: ManagerResponse = {
-                id: 0,
-                name: name,
-                surname: surname,
-                familyName: familyName,
-                placeOfBirth: placeOfBirth,
-                dateOfBirth: date,
-                nationality: nationality,
-                address: address,
-                correspondenceAddress: correspondenceAddress,
-                fathersName: fathersName,
-                mothersName: mothersName,
-                education: education,
-                pharmacyId: selectedPharmacy ? selectedPharmacy.id : 0
-            }
-            addManager(submitRequest)
-            console.log(submitRequest)
-            hidePopover()
+        if (!dateOfBirth) {
+            console.error("Date of birth is required");
+            return;
+        }
+        const submitRequest:ManagerResponse = {
+            name: name,
+            username: username,
+            surname: surname,
+            pesel: pesel,
+            familyName: familyName,
+            placeOfBirth: placeOfBirth,
+            dateOfBirth: dateOfBirth,
+            nationality: nationality,
+            address: address,
+            correspondenceAddress: correspondenceAddress,
+            fathersName: fathersName,
+            mothersName: mothersName,
+            education: education
+        }
+        addManager(submitRequest)
+        onActionComplete()
+        hidePopover()
     }
 
 
     const tableHead1 = () => (
         <>
             <th>Manager Name</th>
+            <th>Username</th>
             <th>Manager Surname</th>
+            <th>Pesel</th>
             <th>Family Name</th>
             <th>Place of Birth</th>
             <th>Date of Birth</th>
-            <th>Nationality</th>
-            <th>Address</th>
 
         </>
     )
 
     const tableHead2 = () => (
         <>
+            <th>Nationality</th>
+            <th>Address</th>
             <th>Correspondence Address</th>
             <th>Father's Name</th>
             <th>Mother's Name</th>
             <th>Education</th>
-            <th>Pharmacy</th>
-            <th></th>
             <th></th>
         </>
     )
 
     const tableBody1 = () => {
-        if (isLoading) return (<tr>
-            <td>Loading...</td>
-        </tr>);
+        if (isLoading) return (
+            <>
+                <tr>
+                    <td>Loading...</td>
+                </tr>
+            </>
+        );
 
         return (
             <>
-            <tr>
+                <tr>
                     <td>
                         <Form.Control
                             type="text"
@@ -114,10 +113,28 @@ export const AddManagerPopover = () => {
                     <td>
                         <Form.Control
                             type="text"
+                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Username"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
                             id="surname"
                             value={surname}
                             onChange={(e) => setSurname(e.target.value)}
                             placeholder="Surname"
+                        />
+                    </td>
+                    <td>
+                        <Form.Control
+                            type="text"
+                            id="pesel"
+                            value={pesel}
+                            onChange={(e) => setPesel(e.target.value)}
+                            placeholder="Pesel"
                         />
                     </td>
                     <td>
@@ -142,26 +159,11 @@ export const AddManagerPopover = () => {
                         <Form.Control
                             type="date"
                             id="dateOfBirth"
-                            value={dateOfBirth}
-                            onChange={(e) => setDateOfBirth(e.target.value)}
-                        />
-                    </td>
-                    <td>
-                        <Form.Control
-                            type="text"
-                            id="nationality"
-                            value={nationality}
-                            onChange={(e) => setNationality(e.target.value)}
-                            placeholder="Nationality"
-                        />
-                    </td>
-                    <td>
-                        <Form.Control
-                            type="text"
-                            id="address"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            placeholder="Address"
+                            value={dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : ""}
+                            onChange={(e) => {
+                                const inputDate = e.target.value; // YYYY-MM-DD format
+                                setDateOfBirth(inputDate ? new Date(inputDate) : null);
+                            }}
                         />
                     </td>
                 </tr>
@@ -170,9 +172,26 @@ export const AddManagerPopover = () => {
     };
 
     const tableBody2 = () => {
-        const safePharmacies = pharmacies || [];
         return (
             <>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="nationality"
+                        value={nationality}
+                        onChange={(e) => setNationality(e.target.value)}
+                        placeholder="Nationality"
+                    />
+                </td>
+                <td>
+                    <Form.Control
+                        type="text"
+                        id="address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Address"
+                    />
+                </td>
                 <td>
                     <Form.Control
                         type="text"
@@ -210,23 +229,6 @@ export const AddManagerPopover = () => {
                     />
                 </td>
                 <td>
-                    <Dropdown drop="down">
-                        <DropdownPick id="dropdown-basic">
-                            {selectedPharmacyName}
-                        </DropdownPick>
-                        <Dropdown.Menu>
-                            {safePharmacies.map((pharmacy: PharmacyResponse) => (
-                                <Dropdown.Item key={pharmacy.id} onClick={() => pickPharmacy(pharmacy)}>
-                                    {pharmacy.name}
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </td>
-                <td>
-
-                </td>
-                <td>
                     <SubmitButton onClick={SubmitManager}>Submit</SubmitButton>
                 </td>
             </>
@@ -235,11 +237,11 @@ export const AddManagerPopover = () => {
 
 
     return (
-        /*TODO: Dodaj fetch drugów do wyboru i post z nowym orderem */
         <Content>
             <Title>Add Manager</Title>
             <ManagerInfo>
-                <StyledTable2Rowed thead1={tableHead1()} tbody1={tableBody1()} thead2={tableHead2()} tbody2={tableBody2()}></StyledTable2Rowed>
+                <StyledTable2Rowed thead1={tableHead1()} tbody1={tableBody1()} thead2={tableHead2()}
+                                   tbody2={tableBody2()}></StyledTable2Rowed>
             </ManagerInfo>
         </Content>
     )
@@ -250,9 +252,6 @@ const SubmitButton = styled(Button)`
     background-color: ${colorPalette.header.hex};
 `
 
-const DropdownPick = styled(Dropdown.Toggle)`
-    background-color: ${colorPalette.header.hex};
-`
 const ManagerInfo = styled.div`
     display: flex;
     flex-direction: column;

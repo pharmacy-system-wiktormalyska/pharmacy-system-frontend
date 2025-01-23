@@ -1,44 +1,185 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
-import { AiOutlineClose } from 'react-icons/ai';
+import {AiOutlineClose} from 'react-icons/ai';
 import {StyledTable} from "../../components/StyledTable.tsx";
-
-interface WarehouseItem {
-    name: string;
-    number: string;
-    expiry: string;
-    price: string;
-    stock: number;
-    description: string;
-}
-
-interface RequestItem {
-    name: string;
-    pharmacist: string;
-    quantity: number;
-    stock: number;
-    description: string;
-}
+import {useGetAllWarehouses} from "../../connection/hooks/useWarehouse.tsx";
+import {
+    DrugOrderResponse,
+    DrugResponse,
+    OrderStatus,
+    PharmacistResponse,
+    WarehouseItemResponse,
+    WarehouseResponse
+} from "../../values/BackendValues.tsx";
+import {useGetPharmacistById} from "../../connection/hooks/usePharmacist.tsx";
+import {useAuth} from "../../auth/AuthContext.tsx";
+import {useGetDrugById} from "../../connection/hooks/useDrug.tsx";
+import {
+    useAcceptDrugOrderById, useAddDrugOrder,
+    useGetDrugOrderById,
+    useRejectDrugOrderById
+} from "../../connection/hooks/useDrugsOrders.tsx";
 
 const WarehousePanel = () => {
     const [activeTab, setActiveTab] = useState<string | 'warehouse'>('warehouse');
-    const [selectedDetails, setSelectedDetails] = useState<WarehouseItem | RequestItem | null>(null);
+    const [selectedDetails, setSelectedDetails] = useState<WarehouseItemResponse | null>(null);
+    const [pharmacist, setPharmacist] = useState<PharmacistResponse | null>(null)
+    const [personelWarehouse, setPersonelWarehouse] = useState<WarehouseResponse | null>(null)
+
+    const {data:fetchedWarehouses} = useGetAllWarehouses()
+    const {mutate: fetchPharmacist} = useGetPharmacistById()
+    const {mutate: fetchDrug} = useGetDrugById()
+    const {mutate: fetchDrugOrder} = useGetDrugOrderById()
+    const {mutate: postAcceptDrugOrder} = useAcceptDrugOrderById()
+    const {mutate: postRejectDrugOrder} = useRejectDrugOrderById()
+    const {mutate: addDrugOrder} = useAddDrugOrder()
+
+    const {storedDecodedToken} = useAuth()
+
+    const [drugs, setDrugs] = useState<Record<string, DrugResponse>>({});
+    const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[]>([]);
 
     //TODO: Czytać z backend
-    const warehouseData: WarehouseItem[] = [
-        { name: 'Estradiol Valerate', number: 'EV001', expiry: '2025-08-15', price: '120 zł', stock: 200, description: 'A long-acting estrogen used in feminizing hormone replacement therapy :3' },
-        { name: 'Ibuprofen 400mg', number: 'IB002', expiry: '2026-01-10', price: '15 zł', stock: 500, description: 'A common pain reliever used to treat inflammation, headaches, and minor aches' },
-    ];
+    useEffect(() => {
+        if (!storedDecodedToken) return;
 
-    const requestListData: RequestItem[] = [
-        { name: 'Paracetamol 500mg', pharmacist: 'Eula Lawrence', quantity: 10, stock: 50, description: 'Widely used for relieving mild to moderate pain and reducing fever' },
-        { name: 'Metformin 500mg', pharmacist: 'Miracle Johnson', quantity: 5, stock: 85, description: 'Used to manage type 2 diabetes by controlling blood sugar levels' },
-    ];
+        fetchPharmacist(
+            { param: storedDecodedToken.user_id.toString() },
+            {
+                onSuccess: (data) => {
+                    setPharmacist(data);
+                },
+                onError: (error) => {
+                    console.error(error);
+                }
+            }
+        );
+    }, [storedDecodedToken]);
 
-    const openDetails = (item: WarehouseItem | RequestItem) => setSelectedDetails(item);
+    useEffect(() => {
+        if (!pharmacist) return;
+        if (!fetchedWarehouses) return;
+
+        const foundWarehouse = fetchedWarehouses.find((warehouse: { pharmacyIds: number[]; }) =>
+            warehouse.pharmacyIds.includes(pharmacist.pharmacyId)
+        );
+        if (!foundWarehouse) return;
+        setPersonelWarehouse(foundWarehouse);
+
+        if (!foundWarehouse?.drugOrderIds) return;
+
+        getDrugOrders(foundWarehouse)
+    }, [pharmacist, fetchedWarehouses]);
+
+    useEffect(() => {
+        if (!pharmacist) return;
+        if (!personelWarehouse) return;
+        if (!personelWarehouse?.stock) return;
+        if (!drugOrders) return;
+
+        const mergedItems = [
+            ...personelWarehouse?.stock ?? [],
+            ...drugOrders
+        ];
+
+        mergedItems.forEach((item: { drugId: string | number; }) => {
+            if (drugs[item.drugId]) return;
+
+            fetchDrug(
+                { param: item.drugId.toString() },
+                {
+                    onSuccess: (data) => {
+                        setDrugs((prev) => ({ ...prev, [item.drugId]: data }));
+                    },
+                    onError: (error) => {
+                        console.error("Error fetching drug:", error);
+                    }
+                }
+            );
+        });
+    }, [pharmacist, personelWarehouse, drugOrders, drugs]);
+
+    const getDrugOrders = (foundWarehouse:WarehouseResponse) => {
+        foundWarehouse.drugOrderIds.forEach((id:number) => {
+            if (!drugOrders.find(drugOrder => drugOrder.id === id))
+
+            fetchDrugOrder(
+                {param: id.toString()},
+                {
+                    onSuccess: (data) => {
+                        setDrugOrders((prev) => [...prev, data]);
+                    }
+                }
+            )
+        })
+    }
+
+    const openDetails = (item: WarehouseItemResponse) => setSelectedDetails(item);
     const closeDetails = () => setSelectedDetails(null);
+
+    const rejectOrder = (drugOrder: DrugOrderResponse) => {
+        if (!personelWarehouse) return;
+        if (!drugOrder.id) return;
+        postRejectDrugOrder(
+            {param: drugOrder.id.toString()},
+            {
+                onSuccess: () => {
+                    alert("Successfully Rejected Order!")
+                },
+                onError: (error) => {
+                    console.error(error)
+                }
+            }
+        )
+        getDrugOrders(personelWarehouse)
+    }
+
+    const acceptOrder = (drugOrder: DrugOrderResponse) => {
+        if (!personelWarehouse) return;
+        if (!drugOrder.id) return;
+        postAcceptDrugOrder(
+            {param: drugOrder.id.toString()},
+            {
+                onSuccess: () => {
+                    alert("Successfully Accepted Order!")
+                },
+                onError: (error) => {
+                    console.error(error)
+                }
+            }
+        )
+        getDrugOrders(personelWarehouse)
+    }
+
+    const createOrder = (warehouseItem:WarehouseItemResponse) => {
+        const drugOrder:DrugOrderResponse = {
+            warehouseId: personelWarehouse?.id || 0,
+            drugId: warehouseItem.drugId,
+            quantity: 1,
+            pharmacistId: pharmacist?.id || 0,
+            managerId: personelWarehouse?.managerId || 0,
+            orderStatus: OrderStatus.PENDING,
+            modificationDateTime: new Date(),
+            completionDateTime: null,
+            isActive: true,
+            creationDateTime: new Date(),
+            id: null
+        }
+
+        addDrugOrder(
+            {body: drugOrder},
+            {
+                onSuccess: ()=> {
+                    alert("Successfully ordered drug: "+drugs[warehouseItem.drugId].name)
+                },
+                onError: (error) => {
+                    console.error(error)
+                }
+            }
+        )
+    }
 
     const tableHead = () => {
         return (
@@ -47,7 +188,6 @@ const WarehousePanel = () => {
                     <>
                         <th>Name</th>
                         <th>Number</th>
-                        <th>Expiry Date</th>
                         <th>Price</th>
                         <th>Action</th>
                     </>
@@ -67,36 +207,40 @@ const WarehousePanel = () => {
     const tableBody = () => {
         return (
             <>
-                {activeTab === 'warehouse' &&
-                    warehouseData.map((item, index) => (
+            {activeTab === 'warehouse' &&
+                personelWarehouse?.stock.map((warehouseItem, index) => {
+                    const drug = drugs[warehouseItem.drugId];
+                    if (!drug) return null;
+                    return (
                         <tr key={index}>
-                            <td>{item.name}</td>
-                            <td>{item.number}</td>
-                            <td>{item.expiry}</td>
-                            <td>{item.price}</td>
+                            <td>{drug.commonName}</td>
+                            <td>{warehouseItem.quantity}</td>
+                            <td>{warehouseItem.priceInCents}</td>
                             <td>
-                                <ActionButton>Order</ActionButton>
-                                <DetailsButton onClick={() => openDetails(item)}>Details</DetailsButton>
+                                <ActionButton onClick={() => createOrder(warehouseItem)}>Order</ActionButton>
+                                <DetailsButton onClick={() => openDetails(warehouseItem)}>Details</DetailsButton>
                             </td>
                         </tr>
-                ))}
+                    );
+                })}
                 {activeTab === 'requestList' &&
-                    requestListData.map((request, index) => (
+                    drugOrders
+                        .filter((request) => request.orderStatus === OrderStatus.PENDING)
+                        .map((request, index) => (
                         <tr key={index}>
-                            <td>{request.name}</td>
-                            <td>{request.pharmacist}</td>
+                            <td>{drugs[request.drugId].name}</td>
+                            <td>{request.pharmacistId}</td>
                             <td>{request.quantity}</td>
                             <td>
-                                <ActionButton>Order</ActionButton>
-                                <RejectButton onClick={() => alert(`Request for ${request.name} rejected.`)}>Reject</RejectButton>
-                                <DetailsButton onClick={() => openDetails(request)}>Details</DetailsButton>
+                                <ActionButton onClick={() => {acceptOrder(request)}}>Order</ActionButton>
+                                <RejectButton onClick={() => {rejectOrder(request)}}>Reject</RejectButton>
+                                {/*<DetailsButton onClick={() => openDetails(drugs[request.drugId])}>Details</DetailsButton>*/}
                             </td>
                         </tr>
                 ))}
             </>
         )
     }
-
     return (
         <BasePanel title="Warehouse panel" panelKey="warehouse">
             <CenteredContainer>
@@ -126,14 +270,14 @@ const WarehousePanel = () => {
                                 </CloseButton>
                             </PopupHeader>
                             <PopupContent>
-                                <CustomH3>{selectedDetails.name}</CustomH3>
+                                <CustomH3>{drugs[selectedDetails.drugId].name}</CustomH3>
                                 <CustomP>
                                     <CustomStrong>Stock</CustomStrong>
-                                    {selectedDetails.stock}
+                                    {selectedDetails.quantity}
                                 </CustomP>
                                 <CustomP>
                                     <CustomStrong>Description</CustomStrong>
-                                    {selectedDetails.description}
+                                    {drugs[selectedDetails.drugId].activeSubstance}
                                 </CustomP>
                             </PopupContent>
                         </PopupContainer>

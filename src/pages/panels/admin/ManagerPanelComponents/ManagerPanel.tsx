@@ -17,28 +17,32 @@ export const ManagerPanel = () => {
 
     const [selectedRow, setSelectedRow] = useState<ManagerResponse | null>(null)
 
-    const {data: allManagers} = useGetAllManagers()
+    const {data: allManagers, refetch} = useGetAllManagers()
 
     useEffect(() => {
         setManagers(allManagers)
-        console.log(allManagers)
     }, [allManagers]);
 
+    const refreshData = () => {
+        setTimeout(() => {
+        refetch().then(() => {});
+        }, 1000);
+    }
 
     const showAddPopover = () => {
-        showPopover(<AddManagerPopover/>)
+        showPopover(<AddManagerPopover onActionComplete={refreshData}/>)
         setSelectedRow(null)
     }
 
     const showUpdatePopover = () => {
         if (selectedRow !== null) {
-            showPopover(<UpdateManagerPopover managerResponse={selectedRow}/>)
+            showPopover(<UpdateManagerPopover managerResponse={selectedRow} onActionComplete={refreshData}/>)
             setSelectedRow(null)
         }
     }
     const showRemovePopover = () => {
         if (selectedRow !== null) {
-            showPopover(RemoveManagerPopover())
+            showPopover(<RemoveManagerPopover manager={selectedRow} onActionComplete={refreshData} />)
             setSelectedRow(null)
         }
     }
@@ -51,16 +55,19 @@ export const ManagerPanel = () => {
         <>
             <th>Manager ID</th>
             <th>Name</th>
+            <th>Username</th>
             <th>Surname</th>
+            <th>Pesel</th>
             <th>Family Name</th>
             <th>Place of Birth</th>
+            <th>Date of Birth</th>
             <th>Nationality</th>
             <th>Address</th>
             <th>Correspondence Address</th>
             <th>Fathers Name</th>
             <th>Mothers Name</th>
             <th>Education</th>
-            <th>Pharmacy ID</th>
+            <th>Pharmacy</th>
         </>
     );
 
@@ -75,7 +82,9 @@ export const ManagerPanel = () => {
                 >
                     <td>{manager.id}</td>
                     <td>{manager.name}</td>
+                    <td>{manager.username}</td>
                     <td>{manager.surname}</td>
+                    <td>{manager.pesel}</td>
                     <td>{manager.familyName}</td>
                     <td>{manager.placeOfBirth}</td>
                     <td>{format(manager.dateOfBirth, 'yyyy/MM/dd')}</td>
@@ -106,7 +115,9 @@ export const ManagerPanel = () => {
     );
 };
 //TODO: Fix React does not recognize the `isSelected` prop on a DOM element.
-const TableRow = styled.tr<{ isSelected: boolean }>`
+const TableRow = styled.tr.withConfig({
+    shouldForwardProp: (prop) => prop !== 'isSelected'
+})<{isSelected: boolean}>`
     background-color: ${({ isSelected }) =>
             isSelected ? "rgba(0,0,0,0.3)" : "transparent"};
     cursor: pointer;
@@ -114,7 +125,7 @@ const TableRow = styled.tr<{ isSelected: boolean }>`
     &:hover {
         background-color: rgba(0, 0, 0, 0.2);
     }
-`;
+`
 const Body = styled.div`
     width: 100%;
     height: 100%;

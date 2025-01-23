@@ -1,17 +1,19 @@
-import {HttpRequestMethods} from "./fetchBackend.tsx";
+import {HttpRequestMethods} from "./fetchBackend.tsx"
 
 export interface Endpoint {
-    url: string;
-    method: HttpRequestMethods;
+    url: string
+    method: HttpRequestMethods
 }
 
 export const APIEndpoints: {
     drugOrders: {
-        getAll: Endpoint;
-        getById: Endpoint;
-        add: Endpoint;
-        update: Endpoint;
-        remove: Endpoint;
+        getAll: Endpoint
+        getById: Endpoint
+        add: Endpoint
+        update: Endpoint
+        remove: Endpoint
+        reject: Endpoint
+        accept: Endpoint
     },
     administrator: {
         getAll: Endpoint
@@ -21,33 +23,37 @@ export const APIEndpoints: {
         remove: Endpoint
     },
     pharmacy: {
-        getAll: Endpoint;
-        getById: Endpoint;
-        add: Endpoint;
-        update: Endpoint;
-        remove: Endpoint;
-    };
+        getAll: Endpoint
+        getById: Endpoint
+        add: Endpoint
+        update: Endpoint
+        remove: Endpoint
+    }
     pharmacist: {
-        getAll: Endpoint;
-        getById: Endpoint;
-        add: Endpoint;
-        update: Endpoint;
-        remove: Endpoint;
-    };
+        getAll: Endpoint
+        getById: Endpoint
+        add: Endpoint
+        update: Endpoint
+        remove: Endpoint
+    }
     drug: {
-        getAll: Endpoint;
-        getById: Endpoint;
-        add: Endpoint;
-        update: Endpoint;
-        remove: Endpoint;
-    };
+        getAll: Endpoint
+        getById: Endpoint
+        add: Endpoint
+        update: Endpoint
+        remove: Endpoint
+    }
     manager: {
-        getAll: Endpoint;
-        getById: Endpoint;
-        add: Endpoint;
-        update: Endpoint;
-        remove: Endpoint;
-    };
+        getAll: Endpoint
+        getById: Endpoint
+        add: Endpoint
+        update: Endpoint
+        remove: Endpoint
+    }
+    warehouse: {
+        getAll: Endpoint
+        getById: Endpoint
+    }
 } = {
     drugOrders: {
         getAll: {
@@ -55,7 +61,7 @@ export const APIEndpoints: {
             method: HttpRequestMethods.GET,
         },
         getById: ({
-            url: `drug/order/get`,
+            url: `drug/order/get/id`,
             method: HttpRequestMethods.GET,
         }),
         add: {
@@ -70,6 +76,14 @@ export const APIEndpoints: {
             url: `drug/order/remove/id`,
             method: HttpRequestMethods.DELETE,
         }),
+        reject: ({
+            url: 'drug/order/reject/id',
+            method: HttpRequestMethods.PATCH
+        }),
+        accept: ({
+            url: 'drug/order/accept/id',
+            method: HttpRequestMethods.PATCH
+        })
     },
     administrator: {
         getAll: {
@@ -99,7 +113,7 @@ export const APIEndpoints: {
             method: HttpRequestMethods.GET,
         },
         getById: ({
-            url: `pharmacy/get`,
+            url: `pharmacy/get/id`,
             method: HttpRequestMethods.GET,
         }),
         add: {
@@ -121,7 +135,7 @@ export const APIEndpoints: {
             method: HttpRequestMethods.GET,
         },
         getById: ({
-            url: `pharmacist/get`,
+            url: `pharmacist/get/id`,
             method: HttpRequestMethods.GET,
         }),
         add: {
@@ -143,7 +157,7 @@ export const APIEndpoints: {
             method: HttpRequestMethods.GET,
         },
         getById: ({
-            url: `drug/get`,
+            url: `drug/get/id`,
             method: HttpRequestMethods.GET,
         }),
         add: {
@@ -181,4 +195,14 @@ export const APIEndpoints: {
             method: HttpRequestMethods.DELETE,
         }),
     },
-};
+    warehouse: {
+        getAll: {
+            url: "warehouse/get/all",
+            method: HttpRequestMethods.GET
+        },
+        getById: {
+            url: "warehouse/get/id",
+            method: HttpRequestMethods.GET
+        }
+    }
+}
