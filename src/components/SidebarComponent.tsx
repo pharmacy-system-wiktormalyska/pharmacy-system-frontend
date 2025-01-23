@@ -35,13 +35,16 @@ const SidebarComponent: React.FC<SidebarProps> = ({name, authorities}) => {
     return (
         <Sidebar>
             <Logo />
-            {hasAccess("*") && <TabButton onClick={() => navigate("owner")}>Owner Panel</TabButton>}
+            {/*TODO: setAccess*/}
             {hasAccess("*") && <TabButton onClick={() => navigate("store")}>Store</TabButton>}
             {hasAccess("*") && <TabButton onClick={() => navigate("prescription")}>Prescriptions</TabButton>}
             {hasAccess("*") && <TabButton onClick={() => navigate("warehouse")}>Warehouse</TabButton>}
             {/*{role && roleHasAccess(role, "department") && <TabButton onClick={() => navigate("/department")}>Department</TabButton>}*/}
-            {hasAccess("*") && <TabButton onClick={() => navigate("drug_order")}>Drug Order Panel</TabButton>}
-
+            {hasAccess("*") && <TabButton onClick={() => navigate("admin/drug_order")}>Admin Drug Order Panel</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("admin/manager")}>Admin Manager Panel</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("admin/drug")}>Admin Drug Panel</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("admin/pharmacy")}>Admin Pharmacy Panel</TabButton>}
+            {hasAccess("*") && <TabButton onClick={() => navigate("admin/pharmacist")}>Admin Pharmacist Panel</TabButton>}
             {/*<RoleSelector value={selectedRole} onChange={handleRoleChange}>*/}
             {/*    {rolesGetter.map(role => (*/}
             {/*        <option key={role.id} value={role.id}>{role.name}</option>*/}

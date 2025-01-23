@@ -2,64 +2,104 @@ import {useEffect, useState} from "react";
 import styled from "styled-components";
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
-import {DrugResponse} from "../../values/BackendValues.tsx";
+import {
+    OrderItemResponse,
+    DrugOrderResponse,
+    DrugResponse,
+    OrderStatus,
+    PharmacistResponse,
+    url
+} from "../../values/BackendValues.tsx";
 import {useGetAllDrugs} from "../../connection/hooks/useDrug.tsx";
-
-
-interface OrderItem {
-    id: number;
-    name: string;
-    quantity: number;
-    price: number;
-    total: number;
-}
+import {usePopover} from "../../components/popover/PopoverContext.tsx";
+import {PaymentPopover} from "../../components/popover/popoverImpl/PaymentPopover.tsx";
+import {StyledTable} from "../../components/StyledTable.tsx";
+import NumberInputWithArrows from "../../components/NumberInputWithArrows.tsx";
+import {useAddDrugOrder} from "../../connection/hooks/useDrugsOrders.tsx";
+import {useAuth} from "../../auth/AuthContext.tsx";
+import {useGetAllPharmacists} from "../../connection/hooks/usePharmacist.tsx";
 
 export const StorePanel = () => {
-    const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+    const [orderItems, setOrderItems] = useState<OrderItemResponse[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
-    //TODO: add connection to backends interface
     const [drugs, setDrugs] =  useState<DrugResponse[]>([])
     const [isLoading, setIsLoading] = useState(true)
+
     const {data: fetchedDrugs} = useGetAllDrugs()
+    const {mutate: addDrugOrder} = useAddDrugOrder()
+    const {data: fetchedPharmacists} = useGetAllPharmacists()
+    const {showPopover} = usePopover()
+
+    const {storedDecodedToken} = useAuth()
+
     useEffect(() => {
         setDrugs(fetchedDrugs)
         setIsLoading(false)
-    }, [fetchedDrugs]);
-
-    // const mediczines: MedicineItem[] =
-
-    /*TODO:Dodać fetch dla backend */
-
-    // const medicines: MedicineItem[] = [
-    //     { id: 1, name: "Ibuprofen 200mg", price: 15, stock: 50, image: ibuprofenImage },
-    //     { id: 2, name: "Paracetamol 500mg", price: 10, stock: 30, image: paracetamolImage },
-    //     { id: 3, name: "Acodin Duo", price: 40, stock: 20, image: acodinImage },
-    //     { id: 4, name: "Vitamin C 1000mg", price: 5, stock: 100, image: vitamincImage },
-    //     { id: 5, name: "Estradiol Valerate", price: 120, stock: 10, image: estradiolImage },
-    // ];
-
-    const addToOrder = (drugs: DrugResponse) => {
+    }, [drugs, fetchedDrugs]);
+    //TODO: Poprawić drug z warestock
+    const addToOrder = (drug: DrugResponse) => {
         setOrderItems((prev) => {
-            const existing = prev.find((item) => item.id === drugs.id);
-
-            if (existing) {
-                return prev.map((item) =>
-                    item.id === drugs.id
-                        ? {
-                            ...item,
-                            quantity: item.quantity + 1,
-                            total: (item.quantity + 1) * drugs.price,
-                        }
-                        : item
-                );
+            const amountInCart = orderItems.find(order => order.drug.id === drug.id)?.quantity || 0
+            const drugStock = (): number => {
+                if (drug.stock === undefined) return 0;
+                else return drug.stock;
+            };
+            if (drugStock() - amountInCart <= 0) {
+                console.log("Not enough drug")
+                return [...prev]
             }
 
-            return [
-                ...prev,
-                { id: drugs.id, name: drugs.name, quantity: 1, price: drugs.price, total: drugs.price },
-            ];
+            const existing = prev.find((boughtItem) => boughtItem.drug.id === drug.id);
+
+            let updatedOrder = [...prev];
+
+            if (existing) {
+                updatedOrder = updatedOrder.map((boughtItem) =>
+                    boughtItem.drug.id === drug.id
+                        ? {
+                            ...boughtItem,
+                            quantity: boughtItem.quantity + 1,
+                            total: (boughtItem.quantity + 1) * drug.price,
+                        }
+                        : boughtItem
+                );
+            } else {
+                updatedOrder.push({
+                    drug: drug,
+                    quantity: 1,
+                    price: drug.price,
+                    id: 0
+                });
+            }
+            return updatedOrder;
         });
     };
+
+    const orderDrug = (drug: DrugResponse) => {
+        const pharmacistID = storedDecodedToken?.user_id || 0
+        const pharmacist = fetchedPharmacists.find((fetchedPharmacist: PharmacistResponse) => fetchedPharmacist.id === pharmacistID);
+        let managerID = 0
+        if (!pharmacist || pharmacist.managerId === undefined) {
+            managerID = 0;
+        } else {
+            managerID = pharmacist.managerId;
+        }
+
+        const drugOrder:DrugOrderResponse = {
+            id: 0,
+            drugId: drug.id,
+            isActive: true,
+            orderStatus: OrderStatus.PENDING,
+            pharmacistId: pharmacistID,
+            managerId: managerID,
+            creationDateTime: new Date(),
+            modificationDateTime: new Date(),
+            quantity: 1
+        }
+        addDrugOrder(drugOrder)
+        alert("Requested order of drug: "+drug.name)
+    }
+
 
     const updateQuantity = (id: number, newQuantity: number) => {
         if (newQuantity < 1) return;
@@ -85,48 +125,64 @@ export const StorePanel = () => {
         drug.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const payment = () => {
+        if (orderItems.length != 0)
+            showPopover(<PaymentPopover boughtItems={orderItems} />)
+        setOrderItems([])
+    }
+    const handleAmountChange = (newAmount: number, id: number | undefined) => {
+        if (id !== undefined) {
+            updateQuantity(id, newAmount);
+        } else {
+            console.warn("ID is undefined. Cannot update quantity.");
+        }
+    };
 
     const totalItems = orderItems.reduce((acc, item) => acc + item.quantity, 0);
-    const totalPrice = orderItems.reduce((acc, item) => acc + item.total, 0);
+    const totalPrice = orderItems.reduce((acc, item) => acc + item.price*item.quantity, 0);
     if (isLoading) return <>Loading...</>
+
+    const tableHead = (
+        <>
+            <th>Drug Name</th>
+            <th>Quantity</th>
+            <th>Price/One</th>
+            <th>Total</th>
+            <th>Action</th>
+        </>
+    )
+
+
+    const tableBody = (
+        <>
+            {orderItems.map((item) => (
+                <tr key={item.id}>
+                    <td>{item.drug.name}</td>
+                    <td>
+                        {isLoading ? (
+                            "Loading..."
+                        ) : (
+                            <NumberInputWithArrows
+                                max={drugs.find(drug => drug.id === item.drug.id)?.stock || 0}
+                                id={item.id}
+                                onValueChange={handleAmountChange} />
+                        )}
+                    </td>
+                    <td>{item.price && "zł"}</td>
+                    <td>{item.price && item.price*item.quantity && "zł"}</td>
+                    <td>
+                        <RemoveButton onClick={() => removeFromOrder(item.id)}>Remove</RemoveButton>
+                    </td>
+                </tr>
+            ))}
+        </>
+    )
+
     return (
         <BasePanel title="Store panel" panelKey="store">
             <Container>
                 <LeftSection>
-                    <TableContainer>
-                        <StyledTable>
-                            <thead>
-                            <tr>
-                                <th>Drug Name</th>
-                                <th>Quantity</th>
-                                <th>Price/One</th>
-                                <th>Total</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {orderItems.map((item) => (
-                                <tr key={item.id}>
-                                    <td>{item.name}</td>
-                                    <td>
-                                        {/*TODO: Użyj tu NumberInputWithArrows*/}
-                                        <StyledInput
-                                            type="number"
-                                            value={item.quantity}
-                                            onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 0)}
-                                            min="1"
-                                        />
-                                    </td>
-                                    <td>{item.price && "zł"}</td>
-                                    <td>{item.price && item.price*item.quantity && "zł"}</td>
-                                    <td>
-                                        <RemoveButton onClick={() => removeFromOrder(item.id)}>Remove</RemoveButton>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </StyledTable>
-                    </TableContainer>
+                        <StyledTable thead={tableHead} tbody={tableBody} />
                 </LeftSection>
                 <RightSection>
                     <SearchInput
@@ -139,17 +195,34 @@ export const StorePanel = () => {
                         <ScrollableArea>
                             {drugs && filteredMedicines.map((drug) => (
                                 <MedicineCard key={drug.id}>
-                                    <MedicineImage src={drug.image} alt={drug.name} />
+                                    <MedicineImage src={url+"static/"+drug.relativeImageUrl} alt={drug.name} />
                                     <MedicineDetails>
                                         <MedicineName>{drug.name}</MedicineName>
                                     </MedicineDetails>
-                                    {/*TODO: Poprawić styl
-                                        Usunąć te które są w koszyku
-                                        Jeżeli za mało to order to warehouse
-                                        wtedy dodaj od razu drug order z iloscia 1 (manager ustawia potem sobie ilosc)
-                                    */}
+                                    {
+                                        (drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0)) !== 0
+                                        ? (
+                                                <InStock>
+                                                    In Stock: {drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0) }
+                                                </InStock>
+                                          )
+                                            : (
+                                                <InStock style={{backgroundColor: "red"}}>
+                                                    In Stock: {drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0) }
+                                                </InStock>
+                                            )
+                                    }
+
                                     <ActionButtons>
-                                        <AddButton onClick={() => addToOrder(drug)}>Add to order</AddButton>
+                                        {
+                                            (drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0)) !== 0
+                                                ? (
+                                                    <AddButton onClick={() => addToOrder(drug)}>Add to order</AddButton>
+                                                )
+                                                : (
+                                                    <AddButton onClick={() => orderDrug(drug)}>Order Drug</AddButton>
+                                                )
+                                        }
                                     </ActionButtons>
                                 </MedicineCard>
                             ))}
@@ -162,7 +235,7 @@ export const StorePanel = () => {
                                 <SummaryText>Total price: {totalPrice} zł</SummaryText>
                             </SummaryTexts>
                             <SummaryButtons>
-                                <ProceedButton>Proceed to payment</ProceedButton>
+                                <ProceedButton onClick={payment}>Proceed to payment</ProceedButton>
                                 <CancelButton onClick={() => setOrderItems([])}>Cancel</CancelButton>
                             </SummaryButtons>
                         </SummaryContent>
@@ -173,6 +246,17 @@ export const StorePanel = () => {
     );
 };
 
+const InStock = styled.div`
+    background-color: ${colorPalette.button.hex};
+    height: 41px;
+    padding: 0 1rem;
+    border-radius: 10px;
+    margin-right: 1rem;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+`
 
 const Container = styled.div`
     display: flex;
@@ -201,76 +285,6 @@ const RightSection = styled.div`
     box-sizing: border-box;
     height: 100%;
     gap: 1rem;
-`;
-
-
-const TableContainer = styled.div`
-    margin-top: 0;
-    height: 100%;
-    overflow-y: auto;
-`;
-
-
-const StyledTable = styled.table`
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background-color: ${colorPalette.lightBackground.hex};
-    border-radius: 10px;
-    overflow: hidden;
-
-    th, td {
-        padding: 15px;
-        text-align: center;
-        font-family: "Outfit Regular", sans-serif;
-        color: #000;
-        border-bottom: 1px solid ${colorPalette.lightBackgroundShadow.hex};
-    }
-
-    th {
-        background-color: ${colorPalette.lightBackgroundShadow.hex};
-        font-size: 16px;
-    }
-
-    tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    @media (max-width: 768px) {
-        th, td {
-            font-size: 14px;
-            padding: 10px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        th, td {
-            font-size: 12px;
-            padding: 8px;
-        }
-    }
-`;
-
-const StyledInput = styled.input`
-    background: transparent;
-    border: none;
-    width: 60px;
-    text-align: center;
-    font-size: inherit;
-    color: inherit;
-    padding: 5px;
-    border-radius: 5px;
-
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    &:focus {
-        outline: none;
-        background-color: rgba(0, 0, 0, 0.05);
-    }
 `;
 
 const RemoveButton = styled.button`

@@ -1,4 +1,4 @@
-import { useFetchFromBackend } from "../fetchBackend";
+import {useFetchFromBackend, useMutateToBackend, usePathParamsToBackend} from "../fetchBackend";
 import {APIEndpoints} from "../Endpoints.tsx";
 
 export const useGetAllDrugs = () => {
@@ -6,22 +6,22 @@ export const useGetAllDrugs = () => {
     return useFetchFromBackend("drug", getAll.url, getAll.method);
 };
 
-export const useGetDrugById = (id: number) => {
-    const getById = APIEndpoints.drug.getById(id);
-    return useFetchFromBackend(`drug-${id}`, getById.url, getById.method);
+export const useGetDrugById = () => {
+    const getById = APIEndpoints.drug.getById;
+    return usePathParamsToBackend(`drug`, getById.url, getById.method);
 };
 
 export const useAddDrug = () => {
     const add = APIEndpoints.drug.add;
-    return useFetchFromBackend("drug-add", add.url, add.method);
+    return useMutateToBackend("drug-add", add.url, add.method);
 };
 
-export const useUpdateDrug = (id: number) => {
-    const update = APIEndpoints.drug.update(id);
-    return useFetchFromBackend(`drug-update-${id}`, update.url, update.method);
+export const useUpdateDrug = () => {
+    const update = APIEndpoints.drug.update;
+    return useMutateToBackend(`drug-update`, update.url, update.method);
 };
 
-export const useRemoveDrug = (id: number) => {
-    const remove = APIEndpoints.drug.remove(id);
-    return useFetchFromBackend(`drug-remove-${id}`, remove.url, remove.method);
+export const useRemoveDrug = () => {
+    const remove = APIEndpoints.drug.remove;
+    return usePathParamsToBackend(`drug-remove`, remove.url, remove.method);
 };

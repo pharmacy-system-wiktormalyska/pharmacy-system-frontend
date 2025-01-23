@@ -7,17 +7,17 @@ import {
     ManagerResponse,
     OrderStatus,
     PharmacistResponse
-} from "../../../values/BackendValues.tsx";
-import NumberInputWithArrows from "../../../components/NumberInputWithArrows.tsx";
-import {StyledTable} from "../../../components/StyledTable.tsx";
-import colorPalette from "../../../values/colors.ts";
+} from "../../../../values/BackendValues.tsx";
+import NumberInputWithArrows from "../../../../components/NumberInputWithArrows.tsx";
+import {StyledTable} from "../../../../components/StyledTable.tsx";
+import colorPalette from "../../../../values/colors.ts";
 import {format} from "date-fns";
-import {useGetAllDrugs} from "../../../connection/hooks/useDrug.tsx";
-import {useGetAllManagers} from "../../../connection/hooks/useManagers.tsx";
-import {useGetAllPharmacists} from "../../../connection/hooks/usePharmacist.tsx";
+import {useGetAllDrugs} from "../../../../connection/hooks/useDrug.tsx";
+import {useGetAllManagers} from "../../../../connection/hooks/useManagers.tsx";
+import {useGetAllPharmacists} from "../../../../connection/hooks/usePharmacist.tsx";
 
-export const UpdateDrugOrderPopover = ({drugOrderResponse}: {drugOrderResponse : DrugOrderResponse}) => {
-    const [drugs, setDrugs] =  useState<DrugResponse[]>([])
+export const UpdatePharmacistPopover = ({managerResponse}: {managerResponse : ManagerResponse}) => {
+    const [drugs, setDrugs] =  useState<ManagerResponse[]>([])
     //TODO: Get drugOrderResponse by id
     const [selectedDrug, setSelectedDrug] = useState<DrugResponse>()
     const [selectedDrugCommonName, setSelectedDrugCommonName] = useState<string>("Select Drug")

@@ -3,8 +3,6 @@ interface role {
     id: number,
     allowedPanels: string[]
 }
-
-//TODO: Stworzone do mockowania i brać z tokenu jaki ma
 export const rolesGetter: role[] = [
     {
         name:"ADMINISTRATOR",
@@ -17,7 +15,7 @@ export const rolesGetter: role[] = [
         allowedPanels: ["prescription", "sell", "order", "warehouse_view"]
     },
     {
-        name: "Warehouse Manager",
+        name: "WAREHOUSE MANAGER",
         id: 2,
         allowedPanels: ["warehouse_edit"]
     },

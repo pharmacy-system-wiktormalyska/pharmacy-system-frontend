@@ -1,16 +1,16 @@
-import BasePanel from "../../components/BasePanel.tsx";
+import BasePanel from "../../../../components/BasePanel.tsx";
 import styled from "styled-components";
-import colorPalette from "../../values/colors.ts";
+import colorPalette from "../../../../values/colors.ts";
 import {useEffect, useState} from "react";
-import {StyledTable} from "../../components/StyledTable.tsx";
-import {DrugOrderResponse} from "../../values/BackendValues.tsx";
-import {usePopover} from "../../components/popover/PopoverContext.tsx";
-import {AddDrugOrderPopover} from "./DrugOrderPanelComponents/AddDrugOrderPopover.tsx";
-import {UpdateDrugOrderPopover} from "./DrugOrderPanelComponents/UpdateDrugOrderPopover.tsx";
-import {RemoveDrugOrderPopover} from "./DrugOrderPanelComponents/RemoveDrugOrderPopover.tsx";
+import {StyledTable} from "../../../../components/StyledTable.tsx";
+import {DrugOrderResponse} from "../../../../values/BackendValues.tsx";
+import {usePopover} from "../../../../components/popover/PopoverContext.tsx";
+import {AddDrugOrderPopover} from "./AddDrugOrderPopover.tsx";
+import {UpdateDrugOrderPopover} from "./UpdateDrugOrderPopover.tsx";
+import {RemoveDrugOrderPopover} from "./RemoveDrugOrderPopover.tsx";
 import { format } from 'date-fns';
-import {useGetAllDrugOrders} from "../../connection/hooks/useDrugsOrders.tsx";
-
+import {useGetAllDrugOrders} from "../../../../connection/hooks/useDrugsOrders.tsx";
+//TODO: Implement Remove and Update
 export const DrugOrderPanel = () => {
     const [drugOrders, setDrugOrders] = useState<DrugOrderResponse[] | null>([]);
     const {showPopover} = usePopover()
@@ -21,6 +21,7 @@ export const DrugOrderPanel = () => {
 
     useEffect(() => {
         setDrugOrders(allDrugOrders)
+        console.log(allDrugOrders)
     }, [allDrugOrders]);
 
 
@@ -50,13 +51,13 @@ export const DrugOrderPanel = () => {
         <>
             <th>Order ID</th>
             <th>Drug ID</th>
+            <th>Warehouse ID</th>
             <th>Quantity</th>
             <th>Pharmacist ID</th>
             <th>Manager ID</th>
             <th>Order Status</th>
             <th>Creation Date Time</th>
             <th>Modification Date Time</th>
-            <th>Is Active</th>
         </>
     );
 
@@ -70,30 +71,20 @@ export const DrugOrderPanel = () => {
                 >
                     <td>{order.id}</td>
                     <td>{order.drugId}</td>
+                    <td>{order.warehouseId}</td>
                     <td>{order.quantity}</td>
                     <td>{order.pharmacistId}</td>
                     <td>{order.managerId}</td>
                     <td>{order.orderStatus}</td>
                     <td>{format(order.creationDateTime, 'yyyy/MM/dd')}</td>
                     <td>{format(order.modificationDateTime, 'yyyy/MM/dd')}</td>
-                    <td>
-                        {order.isActive ? (
-                        <span role="img" aria-label="Active">
-                          ✅
-                        </span>
-                        ) : (
-                        <span role="img" aria-label="Inactive">
-                          ❌
-                        </span>
-                    )}
-                    </td>
                 </TableRow>
             ))}
         </>
     );
 
     return (
-        <BasePanel title="Drug Order Panel">
+        <BasePanel title="Admin Drug Order Panel">
             <Body>
                 <Options>
                     <Option onClick={() => {showAddPopover()}}>Add</Option>
