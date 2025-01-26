@@ -36,7 +36,7 @@ export const StorePanel = () => {
         setDrugs(fetchedDrugs)
         setIsLoading(false)
     }, [drugs, fetchedDrugs]);
-    //TODO: Poprawić drug z warestock!
+    //TODO: Poprawić drug z warestock
     const addToOrder = (drug: DrugResponse) => {
         setOrderItems((prev) => {
             const amountInCart = orderItems.find(order => order.drug.id === drug.id)?.quantity || 0
