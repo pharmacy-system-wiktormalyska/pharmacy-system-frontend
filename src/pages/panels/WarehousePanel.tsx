@@ -105,14 +105,14 @@ const WarehousePanel = () => {
         foundWarehouse.drugOrderIds.forEach((id:number) => {
             if (!drugOrders.find(drugOrder => drugOrder.id === id))
 
-            fetchDrugOrder(
-                {param: id.toString()},
-                {
-                    onSuccess: (data) => {
-                        setDrugOrders((prev) => [...prev, data]);
+                fetchDrugOrder(
+                    {param: id.toString()},
+                    {
+                        onSuccess: (data) => {
+                            setDrugOrders((prev) => [...prev, data]);
+                        }
                     }
-                }
-            )
+                )
         })
     }
 
@@ -163,7 +163,6 @@ const WarehousePanel = () => {
             orderStatus: OrderStatus.PENDING,
             modificationDateTime: new Date(),
             completionDateTime: null,
-            isActive: true,
             creationDateTime: new Date(),
             id: null
         }
@@ -207,37 +206,37 @@ const WarehousePanel = () => {
     const tableBody = () => {
         return (
             <>
-            {activeTab === 'warehouse' &&
-                personelWarehouse?.stock.map((warehouseItem, index) => {
-                    const drug = drugs[warehouseItem.drugId];
-                    if (!drug) return null;
-                    return (
-                        <tr key={index}>
-                            <td>{drug.commonName}</td>
-                            <td>{warehouseItem.quantity}</td>
-                            <td>{warehouseItem.priceInCents}</td>
-                            <td>
-                                <ActionButton onClick={() => createOrder(warehouseItem)}>Order</ActionButton>
-                                <DetailsButton onClick={() => openDetails(warehouseItem)}>Details</DetailsButton>
-                            </td>
-                        </tr>
-                    );
-                })}
+                {activeTab === 'warehouse' &&
+                    personelWarehouse?.stock.map((warehouseItem, index) => {
+                        const drug = drugs[warehouseItem.drugId];
+                        if (!drug) return null;
+                        return (
+                            <tr key={index}>
+                                <td>{drug.commonName}</td>
+                                <td>{warehouseItem.quantity}</td>
+                                <td>{warehouseItem.priceInCents}</td>
+                                <td>
+                                    <ActionButton onClick={() => createOrder(warehouseItem)}>Order</ActionButton>
+                                    <DetailsButton onClick={() => openDetails(warehouseItem)}>Details</DetailsButton>
+                                </td>
+                            </tr>
+                        );
+                    })}
                 {activeTab === 'requestList' &&
                     drugOrders
                         .filter((request) => request.orderStatus === OrderStatus.PENDING)
                         .map((request, index) => (
-                        <tr key={index}>
-                            <td>{drugs[request.drugId].name}</td>
-                            <td>{request.pharmacistId}</td>
-                            <td>{request.quantity}</td>
-                            <td>
-                                <ActionButton onClick={() => {acceptOrder(request)}}>Order</ActionButton>
-                                <RejectButton onClick={() => {rejectOrder(request)}}>Reject</RejectButton>
-                                {/*<DetailsButton onClick={() => openDetails(drugs[request.drugId])}>Details</DetailsButton>*/}
-                            </td>
-                        </tr>
-                ))}
+                            <tr key={index}>
+                                <td>{drugs[request.drugId].name}</td>
+                                <td>{request.pharmacistId}</td>
+                                <td>{request.quantity}</td>
+                                <td>
+                                    <ActionButton onClick={() => {acceptOrder(request)}}>Order</ActionButton>
+                                    <RejectButton onClick={() => {rejectOrder(request)}}>Reject</RejectButton>
+                                    {/*<DetailsButton onClick={() => openDetails(drugs[request.drugId])}>Details</DetailsButton>*/}
+                                </td>
+                            </tr>
+                        ))}
             </>
         )
     }
@@ -259,7 +258,7 @@ const WarehousePanel = () => {
                     </TabButton>
                 </ButtonGroup>
                 <StyledTable thead={tableHead()} tbody={tableBody()}
-            />
+                />
 
                 {selectedDetails && (
                     <PopupOverlay onClick={closeDetails}>

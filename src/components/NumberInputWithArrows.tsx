@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styled from "styled-components";
 import colorPalette from "../values/colors.ts";
@@ -16,27 +16,29 @@ const NumberInputWithArrows = ({id = 0,label, max, min = 1, base_amount = 1, onV
     const [value, setValue] = useState(base_amount);
 
     const increment = () => {
-        if (value < max)
-        {
-            setValue(value + 1);
-            onValueChange(id, value + 1)
+        if (value < max) {
+            const newValue = value + 1;
+            setValue(newValue);
+            onValueChange(newValue, id);
         }
-    }
+    };
+
     const decrement = () => {
-        if (value > min)
-        {
-            setValue(value - 1);
-            onValueChange(id, value - 1)
+        if (value > min) {
+            const newValue = value - 1;
+            setValue(newValue);
+            onValueChange(newValue, id);
         }
-    }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = Number(e.target.value);
-        if (newValue >= min && newValue <= max){
+        if (newValue >= min && newValue <= max) {
             setValue(newValue);
-            onValueChange(id, newValue)
+            onValueChange(newValue, id);
         }
     };
+
 
     return (
         <>

@@ -2,119 +2,90 @@ import {useEffect, useState} from "react";
 import styled from "styled-components";
 import BasePanel from "../../components/BasePanel";
 import colorPalette from "../../values/colors.ts";
-import {
-    OrderItemResponse,
-    DrugOrderResponse,
-    DrugResponse,
-    OrderStatus,
-    PharmacistResponse,
-    url
-} from "../../values/BackendValues.tsx";
+import {OrderItemResponse, DrugResponse, WarehouseResponse, WarehouseItemResponse, url} from "../../values/BackendValues.tsx";
 import {useGetAllDrugs} from "../../connection/hooks/useDrug.tsx";
-import {usePopover} from "../../components/popover/PopoverContext.tsx";
-import {PaymentPopover} from "../../components/popover/popoverImpl/PaymentPopover.tsx";
 import {StyledTable} from "../../components/StyledTable.tsx";
 import NumberInputWithArrows from "../../components/NumberInputWithArrows.tsx";
-import {useAddDrugOrder} from "../../connection/hooks/useDrugsOrders.tsx";
-import {useAuth} from "../../auth/AuthContext.tsx";
-import {useGetAllPharmacists} from "../../connection/hooks/usePharmacist.tsx";
+import {useGetAllWarehouses} from "../../connection/hooks/useWarehouse.tsx";
 
 export const StorePanel = () => {
     const [orderItems, setOrderItems] = useState<OrderItemResponse[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [drugs, setDrugs] =  useState<DrugResponse[]>([])
+    const [drugs, setDrugs] = useState<DrugResponse[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [showSentPopup, setShowSentPopup] = useState(false)
 
     const {data: fetchedDrugs} = useGetAllDrugs()
-    const {mutate: addDrugOrder} = useAddDrugOrder()
-    const {data: fetchedPharmacists} = useGetAllPharmacists()
-    const {showPopover} = usePopover()
-
-    const {storedDecodedToken} = useAuth()
+    const {data: fetchedWarehouses} = useGetAllWarehouses()
 
     useEffect(() => {
-        setDrugs(fetchedDrugs)
-        setIsLoading(false)
-    }, [drugs, fetchedDrugs]);
-    //TODO: Poprawić drug z warestock
+        if (fetchedDrugs) {
+            setDrugs(fetchedDrugs)
+            setIsLoading(false)
+        }
+    }, [fetchedDrugs]);
+
+    const getAvailableStock = (drugId: number): number => {
+        if (!fetchedWarehouses?.length) return 0;
+
+        const warehouseStock = fetchedWarehouses.flatMap((warehouse: WarehouseResponse) =>
+            warehouse.stock.filter((item: WarehouseItemResponse) => item.drugId === drugId)
+        );
+
+        return warehouseStock.reduce((total: number, item: WarehouseItemResponse) => total + item.quantity, 0);
+    };
+
     const addToOrder = (drug: DrugResponse) => {
         setOrderItems((prev) => {
-            const amountInCart = orderItems.find(order => order.drug.id === drug.id)?.quantity || 0
-            const drugStock = (): number => {
-                if (drug.stock === undefined) return 0;
-                else return drug.stock;
-            };
-            if (drugStock() - amountInCart <= 0) {
-                console.log("Not enough drug")
-                return [...prev]
+            const availableStock = getAvailableStock(drug.id || 0);
+            const existingItem = prev.find((order) => order.drug.id === drug.id);
+
+            if (existingItem) {
+                alert("This item is already in the cart");
+                return prev;
             }
 
-            const existing = prev.find((boughtItem) => boughtItem.drug.id === drug.id);
+            if (availableStock <= 0) {
+                alert("Not enough stock");
+                return prev;
+            }
 
-            let updatedOrder = [...prev];
-
-            if (existing) {
-                updatedOrder = updatedOrder.map((boughtItem) =>
-                    boughtItem.drug.id === drug.id
-                        ? {
-                            ...boughtItem,
-                            quantity: boughtItem.quantity + 1,
-                            total: (boughtItem.quantity + 1) * drug.price,
-                        }
-                        : boughtItem
-                );
-            } else {
-                updatedOrder.push({
+            return [
+                ...prev,
+                {
                     drug: drug,
                     quantity: 1,
-                    price: drug.price,
-                    id: 0
-                });
-            }
-            return updatedOrder;
+                    price: 50, // todo mocked cena bo nie ma w DrugResponse
+                    id: prev.length + 1,
+                },
+            ];
         });
     };
 
-    const orderDrug = (drug: DrugResponse) => {
-        const pharmacistID = storedDecodedToken?.user_id || 0
-        const pharmacist = fetchedPharmacists.find((fetchedPharmacist: PharmacistResponse) => fetchedPharmacist.id === pharmacistID);
-        let managerID = 0
-        if (!pharmacist || pharmacist.managerId === undefined) {
-            managerID = 0;
-        } else {
-            managerID = pharmacist.managerId;
-        }
-
-        const drugOrder:DrugOrderResponse = {
-            id: 0,
-            drugId: drug.id,
-            isActive: true,
-            orderStatus: OrderStatus.PENDING,
-            pharmacistId: pharmacistID,
-            managerId: managerID,
-            creationDateTime: new Date(),
-            modificationDateTime: new Date(),
-            quantity: 1
-        }
-        addDrugOrder(drugOrder)
-        alert("Requested order of drug: "+drug.name)
-    }
-
-
     const updateQuantity = (id: number, newQuantity: number) => {
-        if (newQuantity < 1) return;
+        setOrderItems((prev) => {
+            return prev.map((item) => {
+                if (item.id === id) {
+                    const availableStock = getAvailableStock(item.drug.id || 0);
 
-        setOrderItems((prev) =>
-            prev.map((item) =>
-                item.id === id
-                    ? {
+                    if (newQuantity > availableStock) {
+                        alert("Not enough stock available");
+                        return item;
+                    }
+
+                    if (newQuantity <= 0) {
+                        alert("Quantity must be at least 1");
+                        return item;
+                    }
+
+                    return {
                         ...item,
                         quantity: newQuantity,
-                        total: newQuantity * item.price,
-                    }
-                    : item
-            )
-        );
+                    };
+                }
+                return item;
+            });
+        });
     };
 
     const removeFromOrder = (id: number) => {
@@ -125,22 +96,21 @@ export const StorePanel = () => {
         drug.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const payment = () => {
-        if (orderItems.length != 0)
-            showPopover(<PaymentPopover boughtItems={orderItems} />)
-        setOrderItems([])
-    }
     const handleAmountChange = (newAmount: number, id: number | undefined) => {
         if (id !== undefined) {
             updateQuantity(id, newAmount);
-        } else {
-            console.warn("ID is undefined. Cannot update quantity.");
         }
     };
 
     const totalItems = orderItems.reduce((acc, item) => acc + item.quantity, 0);
-    const totalPrice = orderItems.reduce((acc, item) => acc + item.price*item.quantity, 0);
-    if (isLoading) return <>Loading...</>
+    const totalPrice = orderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+    const payment = () => {
+        setShowSentPopup(true);
+        setOrderItems([]);
+    };
+
+    if (isLoading) return <>Loading...</>;
 
     const tableHead = (
         <>
@@ -150,8 +120,7 @@ export const StorePanel = () => {
             <th>Total</th>
             <th>Action</th>
         </>
-    )
-
+    );
 
     const tableBody = (
         <>
@@ -159,30 +128,28 @@ export const StorePanel = () => {
                 <tr key={item.id}>
                     <td>{item.drug.name}</td>
                     <td>
-                        {isLoading ? (
-                            "Loading..."
-                        ) : (
-                            <NumberInputWithArrows
-                                max={drugs.find(drug => drug.id === item.drug.id)?.stock || 0}
-                                id={item.id}
-                                onValueChange={handleAmountChange} />
-                        )}
+                        <NumberInputWithArrows
+                            max={getAvailableStock(item.drug.id || 0)}
+                            id={item.id}
+                            onValueChange={handleAmountChange}
+                            base_amount={item.quantity}
+                        />
                     </td>
-                    <td>{item.price && "zł"}</td>
-                    <td>{item.price && item.price*item.quantity && "zł"}</td>
+                    <td>{item.price.toFixed(2)} zł</td>
+                    <td>{(item.price * item.quantity).toFixed(2)} zł</td>
                     <td>
                         <RemoveButton onClick={() => removeFromOrder(item.id)}>Remove</RemoveButton>
                     </td>
                 </tr>
             ))}
         </>
-    )
+    );
 
     return (
         <BasePanel title="Store panel" panelKey="store">
             <Container>
                 <LeftSection>
-                        <StyledTable thead={tableHead} tbody={tableBody} />
+                    <StyledTable thead={tableHead} tbody={tableBody} />
                 </LeftSection>
                 <RightSection>
                     <SearchInput
@@ -193,55 +160,61 @@ export const StorePanel = () => {
                     />
                     <ScrollableWrapper>
                         <ScrollableArea>
-                            {drugs && filteredMedicines.map((drug) => (
-                                <MedicineCard key={drug.id}>
-                                    <MedicineImage src={url+"static/"+drug.relativeImageUrl} alt={drug.name} />
-                                    <MedicineDetails>
-                                        <MedicineName>{drug.name}</MedicineName>
-                                    </MedicineDetails>
-                                    {
-                                        (drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0)) !== 0
-                                        ? (
-                                                <InStock>
-                                                    In Stock: {drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0) }
-                                                </InStock>
-                                          )
-                                            : (
-                                                <InStock style={{backgroundColor: "red"}}>
-                                                    In Stock: {drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0) }
-                                                </InStock>
-                                            )
-                                    }
+                            {filteredMedicines.map((drug) => {
+                                const availableStock = getAvailableStock(drug.id || 0);
+                                const inCartQuantity = orderItems.find(item => item.drug.id === drug.id)?.quantity || 0;
+                                const remainingStock = availableStock - inCartQuantity;
 
-                                    <ActionButtons>
-                                        {
-                                            (drugs.find(drugFromBackend => drugFromBackend.id === drug.id)?.stock || 0 - (orderItems.find(item => item.drug.id === drug.id)?.quantity || 0)) !== 0
-                                                ? (
-                                                    <AddButton onClick={() => addToOrder(drug)}>Add to order</AddButton>
-                                                )
-                                                : (
-                                                    <AddButton onClick={() => orderDrug(drug)}>Order Drug</AddButton>
-                                                )
-                                        }
-                                    </ActionButtons>
-                                </MedicineCard>
-                            ))}
+                                return (
+                                    <MedicineCard key={drug.id}>
+                                        <MedicineImage src={url+"static/"+drug.relativeImageUrl} alt={drug.name} />
+                                        <MedicineDetails>
+                                            <MedicineName>{drug.name}</MedicineName>
+                                        </MedicineDetails>
+                                        <InStock style={{backgroundColor: remainingStock > 0 ? colorPalette.button.hex : "red"}}>
+                                            In Stock: {remainingStock}
+                                        </InStock>
+                                        <ActionButtons>
+                                            {remainingStock > 0 ? (
+                                                <AddButton onClick={() => addToOrder(drug)}>Add</AddButton>
+                                            ) : (
+                                                <AddButton disabled>Out of Stock</AddButton>
+                                            )}
+                                        </ActionButtons>
+                                    </MedicineCard>
+                                );
+                            })}
                         </ScrollableArea>
                     </ScrollableWrapper>
                     <SummaryCard>
                         <SummaryContent>
                             <SummaryTexts>
                                 <SummaryText>Total items: {totalItems}</SummaryText>
-                                <SummaryText>Total price: {totalPrice} zł</SummaryText>
+                                <SummaryText>Total price: {totalPrice.toFixed(2)} zł</SummaryText>
                             </SummaryTexts>
                             <SummaryButtons>
-                                <ProceedButton onClick={payment}>Proceed to payment</ProceedButton>
+                                <ProceedButton
+                                    onClick={payment}
+                                    disabled={orderItems.length === 0}
+                                >
+                                    Proceed to payment
+                                </ProceedButton>
                                 <CancelButton onClick={() => setOrderItems([])}>Cancel</CancelButton>
                             </SummaryButtons>
                         </SummaryContent>
                     </SummaryCard>
                 </RightSection>
             </Container>
+
+            {showSentPopup && (
+                <PopupOverlay onClick={() => setShowSentPopup(false)}>
+                    <PopupContainer onClick={(e) => e.stopPropagation()}>
+                        <PopupContent>
+                            <h2>Sent</h2>
+                        </PopupContent>
+                    </PopupContainer>
+                </PopupOverlay>
+            )}
         </BasePanel>
     );
 };
@@ -474,5 +447,32 @@ const CancelButton = styled.button`
     cursor: pointer;
     &:hover {
         background-color: #d32f2f;
+    }
+`;
+
+const PopupOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+`;
+
+const PopupContainer = styled.div`
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+`;
+
+const PopupContent = styled.div`
+    h2 {
+        color: ${colorPalette.darkText.hex};
+        margin: 0;
     }
 `;
