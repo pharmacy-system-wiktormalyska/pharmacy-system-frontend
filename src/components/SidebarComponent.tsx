@@ -87,7 +87,6 @@ export const Logo = styled.div`
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-    filter: invert(1);
     margin-top: 20px;
     margin-bottom: 40px;
 `;
