@@ -31,7 +31,7 @@ const WarehousePanel = () => {
     const {data:fetchedWarehouses} = useGetAllWarehouses()
     const {mutate: fetchPharmacist} = useGetPharmacistById()
     const {mutate: fetchDrug} = useGetDrugById()
-    const {mutate: fetchDrugOrder} = useGetDrugOrderById()
+    const {mutate: fetchDrugOrder, } = useGetDrugOrderById()
     const {mutate: postAcceptDrugOrder} = useAcceptDrugOrderById()
     const {mutate: postRejectDrugOrder} = useRejectDrugOrderById()
     const {mutate: addDrugOrder} = useAddDrugOrder()
@@ -133,7 +133,13 @@ const WarehousePanel = () => {
                 }
             }
         )
+        refreshData()
+    }
+    const refreshData = () => {
+        setTimeout(() => {
+            if (!personelWarehouse) return
         getDrugOrders(personelWarehouse)
+        }, 1000);
     }
 
     const acceptOrder = (drugOrder: DrugOrderResponse) => {
@@ -150,7 +156,7 @@ const WarehousePanel = () => {
                 }
             }
         )
-        getDrugOrders(personelWarehouse)
+        refreshData()
     }
 
     const createOrder = (warehouseItem:WarehouseItemResponse) => {
@@ -224,7 +230,7 @@ const WarehousePanel = () => {
                     })}
                 {activeTab === 'requestList' &&
                     drugOrders
-                        .filter((request) => request.orderStatus === OrderStatus.PENDING)
+                        .filter((request) => request.drugOrderStatus === "PENDING")
                         .map((request, index) => (
                             <tr key={index}>
                                 <td>{drugs[request.drugId].name}</td>

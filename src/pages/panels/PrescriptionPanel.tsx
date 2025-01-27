@@ -222,6 +222,7 @@ const FormContainer = styled.form`
     border-radius: 10px;
     gap: 20px;
     flex-wrap: wrap;
+    color: black;
 `;
 
 
@@ -360,16 +361,16 @@ const CloseButton = styled.button`
     background: none;
     border: none;
     cursor: pointer;
-    color: ${colorPalette.darkText.hex};
     font-size: 24px;
     display: flex;
     align-items: center;
+    filter: invert(1);
     justify-content: center;
 `;
 
 
 const PopupContent = styled.div`
-    margin-top: 30px;
+    color: black;
 
     h3 {
         font-size: 24px;
@@ -383,6 +384,7 @@ const PopupContent = styled.div`
         text-align: left;
         font-size: 16px;
         font-family: "Outfit Light", sans-serif;
+        color: black;
     }
 
     p strong {
@@ -390,5 +392,6 @@ const PopupContent = styled.div`
         margin-bottom: 5px;
         font-size: 16px;
         font-family: "Outfit Regular", sans-serif;
+        color: black;
     }
 `;

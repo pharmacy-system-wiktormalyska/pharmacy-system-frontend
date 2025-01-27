@@ -210,7 +210,7 @@ export const StorePanel = () => {
                 <PopupOverlay onClick={() => setShowSentPopup(false)}>
                     <PopupContainer onClick={(e) => e.stopPropagation()}>
                         <PopupContent>
-                            <h2>Sent</h2>
+                            <h2>Purchase Complete!</h2>
                         </PopupContent>
                     </PopupContainer>
                 </PopupOverlay>
